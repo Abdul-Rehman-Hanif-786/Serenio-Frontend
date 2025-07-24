@@ -36,7 +36,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #f6f9ff;
+  background-color: #e3e8f2;
   padding: 3rem;
   border-radius: 20px;
   flex-wrap: wrap;
@@ -44,6 +44,9 @@ body {
 
 .hero-content {
   max-width: 500px;
+}
+.hero-content button:hover{
+  color: #2a23ae;
 }
 
 .hero-content h1 {

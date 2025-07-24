@@ -3,10 +3,10 @@
 .payment-card {
   max-width: 400px;
   margin: 40px auto;
-  background: #E0E7FF;
+  background: #F2F4FC;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 10px 20px rgba(30, 42, 71, 0.05);
+  box-shadow: 0 10px 20px rgba(30, 42, 71, 0.08);
   font-family: "DM Sans", sans-serif;
   text-align: center;
 }
@@ -14,18 +14,18 @@
 .payment-header h2 {
   margin-top: 12px;
   font-size: 20px;
-  color: #1E2A47;
+  color: #1A202C;
 }
 
 .payment-header p {
-  color: #1E2A47;
+  color: #4A5568;
   font-size: 14px;
   margin-bottom: 24px;
 }
 
 .icon-circle {
-  background: #1E2A47;
-  color: #E0E7FF;
+  background: #5A67D8;
+  color: #F2F4FC;
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -48,20 +48,21 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid #E0E7FF;
+  border: 1px solid #E2E8F0;
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
+  background-color: #ffffff;
 }
 
 .method:hover {
-  background-color: #E0E7FF;
+  background-color: #EDF2F7;
 }
 
 .method.selected {
-  border-color: #1E2A47;
-  background-color: #E0E7FF;
+  border-color: #2C7A7B;
+  background-color: #E6FFFA;
 }
 
 .method input {
@@ -71,12 +72,12 @@
 .method strong {
   display: block;
   font-size: 15px;
-  color: #1E2A47;
+  color: #2D3748;
 }
 
 .method p {
   font-size: 13px;
-  color: #1E2A47;
+  color: #4A5568;
   margin: 0;
 }
 
@@ -84,7 +85,7 @@
   font-size: 24px;
   width: 32px;
   text-align: center;
-  color: #1E2A47;
+  color: #2C7A7B;
 }
 
 .form-group {
@@ -97,23 +98,23 @@
   font-size: 14px;
   margin-bottom: 6px;
   font-weight: 500;
-  color: #1E2A47;
+  color: #1A202C;
 }
 
 .form-group input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #E0E7FF;
+  border: 1px solid #CBD5E0;
   border-radius: 6px;
   font-size: 14px;
-  background-color: #E0E7FF;
-  color: #1E2A47;
+  background-color: #F7FAFC;
+  color: #2D3748;
 }
 
 .submit-btn {
   width: 100%;
-  background: #1E2A47;
-  color: #E0E7FF;
+  background: #2C7A7B;
+  color: white;
   padding: 12px;
   border: none;
   border-radius: 8px;
@@ -124,115 +125,12 @@
 }
 
 .submit-btn:hover {
-  background: #E0E7FF;
-  color: #1E2A47;
+  background: #285E61;
 }
 
 .secured-text {
   font-size: 12px;
-  color: #1E2A47;
+  color: #718096;
   margin-top: 16px;
   text-align: center;
-}
-
-/* ------------------------------- */
-/* Responsive Design Enhancements */
-/* ------------------------------- */
-
-/* Tablets */
-@media (max-width: 768px) {
-  .payment-card {
-    padding: 20px;
-    margin: 30px 16px;
-  }
-
-  .payment-header h2 {
-    font-size: 18px;
-  }
-
-  .payment-header p {
-    font-size: 13px;
-  }
-
-  .method strong {
-    font-size: 14px;
-  }
-
-  .method p {
-    font-size: 12px;
-  }
-
-  .form-group label {
-    font-size: 13px;
-  }
-
-  .form-group input {
-    font-size: 13px;
-  }
-
-  .submit-btn {
-    font-size: 14px;
-  }
-}
-
-/* Mobile phones */
-@media (max-width: 480px) {
-  .payment-card {
-    padding: 16px;
-    margin: 20px 12px;
-    border-radius: 12px;
-  }
-
-  .payment-header h2 {
-    font-size: 16px;
-  }
-
-  .payment-header p {
-    font-size: 12px;
-  }
-
-  .icon-circle {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .method {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 10px;
-  }
-
-  .icon {
-    font-size: 20px;
-    width: 100%;
-    text-align: left;
-  }
-
-  .method strong {
-    font-size: 13px;
-  }
-
-  .method p {
-    font-size: 11px;
-  }
-
-  .form-group label {
-    font-size: 12px;
-  }
-
-  .form-group input {
-    font-size: 12px;
-    padding: 8px;
-  }
-
-  .submit-btn {
-    font-size: 13px;
-    padding: 10px;
-  }
-
-  .secured-text {
-    font-size: 11px;
-  }
 }
