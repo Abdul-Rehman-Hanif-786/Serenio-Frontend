@@ -1,8 +1,11 @@
+/* Import DM Sans */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
+
 /* Layout */
 .dashboard-layout {
   display: flex;
   height: 100vh;
-  font-family: 'Ariel';
+  font-family: 'DM Sans', sans-serif;
   background-color: #f8f9fb;
 }
 
@@ -117,6 +120,7 @@
   border-radius: 5px;
 }
 
+/* Buttons */
 .export-btn,
 .add-user {
   background-color: #007bff;
