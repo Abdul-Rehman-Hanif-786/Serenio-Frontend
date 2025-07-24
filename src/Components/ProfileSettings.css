@@ -1,0 +1,210 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+
+.profile-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 1rem;
+  font-family: "DM Sans", sans-serif;
+  color: #1E2A47;
+}
+
+.heading {
+  font-size: 18px;
+  color: #1E2A47;
+  margin-bottom: 20px;
+}
+
+.profile-card {
+  background: #E0E7FF;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(30, 42, 71, 0.05);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.subtext {
+  font-size: 13px;
+  color: #1E2A47;
+}
+
+.profile-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.profile-form input,
+.profile-form select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  border: 1px solid #E0E7FF;
+  border-radius: 6px;
+  background-color: #E0E7FF;
+  color: #1E2A47;
+}
+
+.lang-switch {
+  margin-bottom: 16px;
+}
+
+.toggle {
+  display: flex;
+  margin-top: 8px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toggle button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #E0E7FF;
+  border-radius: 6px;
+  background: #E0E7FF;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1E2A47;
+}
+
+.toggle button.active {
+  background: #E0E7FF;
+  color: #1E2A47;
+  border-color: #1E2A47;
+}
+
+.password-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.note {
+  font-size: 12px;
+  color: #1E2A47;
+}
+
+.reset-btn {
+  padding: 8px 14px;
+  border: 1px solid #E0E7FF;
+  background: #E0E7FF;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1E2A47;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 10px 18px;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  flex: 1;
+  min-width: 140px;
+}
+
+.cancel-btn {
+  background: #E0E7FF;
+  color: #1E2A47;
+}
+
+.save-btn {
+  background: #1E2A47;
+  color: #E0E7FF;
+}
+
+.additional-settings {
+  background: #E0E7FF;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.setting-item {
+  padding: 12px;
+  border-bottom: 1px solid #E0E7FF;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1E2A47;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+/* --------- Responsive Polish --------- */
+@media (max-width: 768px) {
+  .profile-container {
+    margin: 20px auto;
+  }
+
+  .profile-card {
+    padding: 16px;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+  }
+
+  .password-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .toggle button {
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .heading {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .profile-form label {
+    font-size: 13px;
+  }
+
+  .reset-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -1,0 +1,133 @@
+/* Signup.css */
+
+body {
+  background-color: #f7f9fc;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.signup-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: whitesmoke;
+}
+
+.signup-card {
+  background-color: white;
+  padding: 40px 30px;
+  width: 360px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.avatar-icon {
+  font-size: 32px;
+  background-color: white;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signup-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.signup-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+.input-wrapper {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.signup-input {
+  width: 100%;
+  padding: 12px 40px 12px 36px; /* Adjust for icon space */
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+.password-strength {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: start;
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 16px;
+  gap: 8px;
+  text-align: left;
+}
+
+.checkbox-wrapper a {
+  color: #4f46e5;
+  text-decoration: none;
+}
+
+.signup-button {
+  background-color: #4f46e5;
+  color: white;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.signin-link {
+  font-size: 13px;
+  margin-top: 8px;
+  color: #374151;
+}
+
+.link {
+  color: #4f46e5;
+  text-decoration: none;
+  font-weight: bold;
+}
