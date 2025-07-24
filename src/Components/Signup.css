@@ -1,8 +1,15 @@
 /* Signup.css */
 
+/* Import DM Sans from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
+
+/* Apply DM Sans globally */
+body, .signup-wrapper, .signup-card, input, button, a, p, span, label {
+  font-family: 'DM Sans', sans-serif;
+}
+
 body {
   background-color: #f7f9fc;
-  font-family: 'Segoe UI', sans-serif;
 }
 
 .signup-wrapper {

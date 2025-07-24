@@ -1,8 +1,15 @@
 /* Login.css */
 
+/* Import DM Sans from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
+
+/* Apply DM Sans to all elements */
+html, body, input, button, a, p, span, div {
+  font-family: 'DM Sans', sans-serif;
+}
+
 body {
   background-color: #E0E7FF;
-  font-family: 'Segoe UI', sans-serif;
 }
 
 .login-wrapper {
