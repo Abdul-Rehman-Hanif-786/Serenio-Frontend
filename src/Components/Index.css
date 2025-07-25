@@ -40,6 +40,7 @@ body {
   padding: 3rem;
   border-radius: 20px;
   flex-wrap: wrap;
+  margin-top: 2rem;
 }
 
 .hero-content {
@@ -64,6 +65,9 @@ body {
   font-size: 1.1rem;
   line-height: 1.6;
 }
+.hero-content button:hover{
+  color: #1589a0;
+}
 
 .get-started {
   background-color: #1d1359;
@@ -74,6 +78,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   margin-top: 1rem;
+  
 }
 
 .hero-image img {

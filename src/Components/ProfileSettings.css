@@ -5,19 +5,19 @@
   margin: 40px auto;
   padding: 0 1rem;
   font-family: "DM Sans", sans-serif;
-  color: #1E2A47;
+  color: #0F1C4D;
 }
 
 .heading {
   font-size: 18px;
-  color: #1E2A47;
+  color: #0F1C4D;
   margin-bottom: 20px;
 }
 
 .profile-card {
-  background: #E0E7FF;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(30, 42, 71, 0.05);
+  box-shadow: 0 6px 12px rgba(15, 28, 77, 0.08);
   padding: 24px;
   margin-bottom: 20px;
 }
@@ -36,7 +36,7 @@
 
 .subtext {
   font-size: 13px;
-  color: #1E2A47;
+  color: #5566A3;
 }
 
 .profile-form label {
@@ -52,10 +52,17 @@
   padding: 10px;
   margin-bottom: 16px;
   font-size: 14px;
-  border: 1px solid #E0E7FF;
+  border: 1px solid #BFD1FF;
   border-radius: 6px;
-  background-color: #E0E7FF;
-  color: #1E2A47;
+  background-color: #F3F6FF;
+  color: #0F1C4D;
+}
+
+.profile-form input:focus,
+.profile-form select:focus {
+  outline: none;
+  border-color: #557CFF;
+  background-color: #FFFFFF;
 }
 
 .lang-switch {
@@ -72,19 +79,19 @@
 .toggle button {
   flex: 1;
   padding: 10px;
-  border: 1px solid #E0E7FF;
+  border: 1px solid #BFD1FF;
   border-radius: 6px;
-  background: #E0E7FF;
+  background: #F3F6FF;
   font-weight: bold;
   cursor: pointer;
   font-size: 14px;
-  color: #1E2A47;
+  color: #0F1C4D;
 }
 
 .toggle button.active {
-  background: #E0E7FF;
-  color: #1E2A47;
-  border-color: #1E2A47;
+  background: #557CFF;
+  color: #ffffff;
+  border-color: #0F1C4D;
 }
 
 .password-section {
@@ -98,17 +105,21 @@
 
 .note {
   font-size: 12px;
-  color: #1E2A47;
+  color: #5566A3;
 }
 
 .reset-btn {
   padding: 8px 14px;
-  border: 1px solid #E0E7FF;
-  background: #E0E7FF;
+  border: 1px solid #BFD1FF;
+  background: #F3F6FF;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  color: #1E2A47;
+  color: #0F1C4D;
+}
+
+.reset-btn:hover {
+  background: #E3EBFF;
 }
 
 .form-buttons {
@@ -127,31 +138,41 @@
   cursor: pointer;
   flex: 1;
   min-width: 140px;
+  transition: 0.3s ease;
 }
 
 .cancel-btn {
-  background: #E0E7FF;
-  color: #1E2A47;
+  background: #ffffff;
+  color: #0F1C4D;
+  border: 1px solid #BFD1FF;
+}
+
+.cancel-btn:hover {
+  background-color: #E3EBFF;
 }
 
 .save-btn {
-  background: #1E2A47;
-  color: #E0E7FF;
+  background: #0F1C4D;
+  color: #ffffff;
+}
+
+.save-btn:hover {
+  background: #2640B7;
 }
 
 .additional-settings {
-  background: #E0E7FF;
+  background: #F3F6FF;
   padding: 16px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 4px 10px rgba(15, 28, 77, 0.04);
 }
 
 .setting-item {
   padding: 12px;
-  border-bottom: 1px solid #E0E7FF;
+  border-bottom: 1px solid #BFD1FF;
   cursor: pointer;
   font-size: 14px;
-  color: #1E2A47;
+  color: #0F1C4D;
 }
 
 .setting-item:last-child {
