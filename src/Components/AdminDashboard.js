@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Dashboard.css';
+import './AdminDashboard.css';
 import api from '../api/axios';
 import Loader from './Loader';
 
@@ -81,7 +81,7 @@ const Dashboard = () => {
           </div> */}
           <nav className="sidebar-nav">
             <ul>
-              <li><a href="/DashboardHome">Home</a></li>
+              <li><a href="/UserDashboard">UserDashboard</a></li>
               <li><a href="/Professionals">Professionals</a></li>
               <li><a href="/SentimentAnalysis">Sentiment Analysis</a></li>
               <li><a href="/profile">Profile setting</a></li>
@@ -92,10 +92,16 @@ const Dashboard = () => {
       )}
 
       <main className="dashboard-content">
-        <div className="dashboard-header">
-          <h1>Admin Dashboard</h1>
-          <p>Monitor user activities and manage system logs</p>
-        </div>
+        
+        <nav className="admin-navbar">
+          <div className="sidebar-header">
+            <img src={require("../assets/DashboardLogo.png")} alt="logo" className="logo-img" />
+          </div>
+          <div className="admin-navbar-content">
+            <h1>Admin Dashboard</h1>
+            <p>Monitor user activities and manage system logs</p>
+          </div>
+        </nav>
 
         <div
           className="sidebar-toggle-container"

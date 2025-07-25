@@ -22,14 +22,14 @@
 .sidebar-header {
   font-size: 20px;
   font-weight: bold;
-  margin-bottom: 30px;
+  margin-top: 70px;
   color: #333;
 }
 
 .sidebar-nav ul {
   list-style: none;
   padding: 0;
-  margin-top: 35px;
+  margin-top: 40px;
 }
 
 .sidebar-nav li {
@@ -45,6 +45,10 @@
   background-color: #e8f0fe;
   font-weight: 600;
 }
+.sidebar-nav a{
+  text-decoration: none;
+  color: inherit;
+}
 
 /* Content Area */
 .dashboard-content {
@@ -53,18 +57,48 @@
   overflow-y: auto;
 }
 
-.dashboard-header h1 {
-  margin-left: 15px;
-  font-size: 24px;
-  font-weight: 600;
-  color: #2c3e50;
+
+
+.admin-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #0b3d91; /* Dark blue */
+  color: white;
+  padding: 15px 30px;
+  position: relative;
+  height: 80px;
+  border-radius: 18px;
 }
 
-.dashboard-header p {
-  font-size: 14px;
-  color: #7f8c8d;
-  margin-top: 4px;
-  margin-left: 15px;
+.sidebar-header {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 50px;   /* adjust as needed */
+  width: auto;
+  margin-bottom: 65px;
+}
+
+/* Centered content inside the navbar */
+.admin-navbar-content {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.admin-navbar-content h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.admin-navbar-content p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #d0dfff;
 }
 
 /* Dashboard Cards */
@@ -221,34 +255,19 @@ th {
   color: #dc3545;
 }
 /* Sidebar Toggle Button */
-.sidebar-toggle {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: fixed;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 1001;
-}
-.sidebar-toggle {
-  margin-top: 15px;
-  
-}
-/* Sidebar Toggle Container (just below navbar) */
 .sidebar-toggle-container {
   position: fixed;
-  top: 60px; /* Adjust as per your navbar height */
+  top: 20px;                /* Adjust based on where you want it */
   left: 0;
-  padding: 5px 10px;
-  z-index: 1001;
-  height: 40px;
-  width: 40px;
+  height: 25px;
+  width: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
+  z-index: 1001;
+  margin-left: 15px;
 }
 
 .sidebar-toggle-container:hover {
@@ -264,6 +283,7 @@ th {
   border-radius: 4px;
   cursor: pointer;
 }
+
 
 
 @media (max-width: 768px) {

@@ -46,7 +46,7 @@
 }
 
 .navbar-links li {
-  display: inline;
+  display: list-item;
 }
 
 .navbar-links a {

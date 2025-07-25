@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Loader from "./Loader"; // Ensure Loader supports a `size` prop
-import "./DashboardHome.css";
+import "./UserDashboard.css";
 
 const DashboardHome = () => {
   const navigate = useNavigate();

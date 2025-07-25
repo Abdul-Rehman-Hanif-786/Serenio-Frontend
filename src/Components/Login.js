@@ -56,14 +56,23 @@ const Login = () => {
 
     try {
       const response = await api.post("/login", { email, password });
-      localStorage.setItem("token", response.data.token);
+      const { token, role } = response.data;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
 
       toast.success("Login successful!", {
         position: "top-center",
-        autoClose: 5000,
+        autoClose: 3000,
       });
 
-      setTimeout(() => navigate("/dashboard"), 1500);
+      setTimeout(() => {
+        if (role === "admin") {
+          navigate("/AdminDashboard");
+        } else {
+          navigate("/UserDashboard");
+        }
+      }, 1500);
     } catch (err) {
       const message = err.response?.data?.message || "Login failed. Please try again.";
       setError(message);
