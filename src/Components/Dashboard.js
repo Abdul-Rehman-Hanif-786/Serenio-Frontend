@@ -13,6 +13,8 @@ const Dashboard = () => {
   const [loadingPage, setLoadingPage] = useState(true);
   const [exportLoading, setExportLoading] = useState(false);
   const [addUserLoading, setAddUserLoading] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [toggleHovered, setToggleHovered] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -28,7 +30,6 @@ const Dashboard = () => {
         console.error("Dashboard data fetch error:", err);
 
         if (err.response?.status === 401) {
-          // ✅ Save message and redirect to login
           localStorage.removeItem("token");
           localStorage.setItem("loginMessage", "Session expired. Please login again.");
           navigate('/login');
@@ -73,25 +74,42 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-layout">
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <img src={require("../assets/DashboardLogo.png")} alt="logo" className="logo-img" />
-        </div>
-        <nav className="sidebar-nav">
-          <ul>
-            <li><a href="/DashboardHome">Home</a></li>
-            <li><a href="/Professionals">Professionals</a></li>
-            <li><a href="/SentimentAnalysis">Sentiment Analysis</a></li>
-            <li><a href="/profile">Profile setting</a></li>
-            <li><a href="/Logs">SystemMonitoringLogs</a></li>
-          </ul>
-        </nav>
-      </aside>
+      {sidebarVisible && (
+        <aside className="sidebar">
+          {/* <div className="sidebar-header">
+            <img src={require("../assets/DashboardLogo.png")} alt="logo" className="logo-img" />
+          </div> */}
+          <nav className="sidebar-nav">
+            <ul>
+              <li><a href="/DashboardHome">Home</a></li>
+              <li><a href="/Professionals">Professionals</a></li>
+              <li><a href="/SentimentAnalysis">Sentiment Analysis</a></li>
+              <li><a href="/profile">Profile setting</a></li>
+              <li><a href="/Logs">SystemMonitoringLogs</a></li>
+            </ul>
+          </nav>
+        </aside>
+      )}
 
       <main className="dashboard-content">
         <div className="dashboard-header">
           <h1>Admin Dashboard</h1>
           <p>Monitor user activities and manage system logs</p>
+        </div>
+
+        <div
+          className="sidebar-toggle-container"
+          onMouseEnter={() => setToggleHovered(true)}
+          onMouseLeave={() => setToggleHovered(false)}
+        >
+          {toggleHovered && (
+            <button
+              className="sidebar-toggle"
+              onClick={() => setSidebarVisible((prev) => !prev)}
+            >
+              &#9776;
+            </button>
+          )}
         </div>
 
         <div className="dashboard-cards">

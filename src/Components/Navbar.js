@@ -6,8 +6,8 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-logo">
-  <img src={require("../assets/logo.png")} alt="logo" className="logo-img" />
-</div>
+        <img src={require("../assets/logo.png")} alt="logo" className="logo-img" />
+      </div>
 
       <ul className="navbar-links">
         <li>

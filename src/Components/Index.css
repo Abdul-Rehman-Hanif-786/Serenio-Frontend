@@ -203,3 +203,94 @@ body {
   font-size: 14px;
   color: #555;
 }
+
+/* === Responsive Design === */
+
+/* For tablets and smaller devices */
+@media (max-width: 1024px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .hero-content {
+    max-width: 100%;
+  }
+
+  .hero-image img {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .feature-grid,
+  .resource-grid,
+  .testimonial-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .feature-card,
+  .resource-card,
+  .testimonial-card {
+    width: 90%;
+    max-width: 400px;
+  }
+}
+
+/* For mobile devices */
+@media (max-width: 600px) {
+  .landing-page {
+    padding: 1rem;
+  }
+
+  .navbar {
+    flex-direction: column;
+    gap: 1rem;
+    font-size: 1rem;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+  .hero-image{
+    padding-top: 20px;
+  }
+
+  .get-started {
+    width: 100%;
+    padding: 0.75rem;
+    padding-bottom: 10px;
+  }
+
+  .features,
+  .testimonials,
+  .resources {
+    padding: 2rem 1rem;
+  }
+
+  .features h2,
+  .testimonials h2,
+  .resources h2 {
+    font-size: 1.5rem;
+  }
+
+  .feature-card h3,
+  .resource-card h4 {
+    font-size: 1.1rem;
+  }
+
+  .feature-card p,
+  .resource-card p {
+    font-size: 0.9rem;
+  }
+
+  .testimonial-card {
+    font-size: 0.95rem;
+  }
+}
