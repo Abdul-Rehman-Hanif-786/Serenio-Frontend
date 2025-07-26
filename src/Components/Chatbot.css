@@ -154,6 +154,27 @@ html, body {
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(30, 41, 59, 0.4);
 }
+.sentiment {
+  margin-left: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8em;
+}
+
+.sentiment.neutral {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.sentiment.positive {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.sentiment.negative {
+  background-color: #f8d7da;
+  color: #721c24;
+}
 
 .end-chat-button:hover {
   background-color: #1E293B;

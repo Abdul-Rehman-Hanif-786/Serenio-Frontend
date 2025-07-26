@@ -3,6 +3,17 @@ import "./Chatbot.css";
 import api from "../api/axios";
 import Loader from "./Loader";
 
+// Simple sentiment analysis function
+const analyzeSentiment = (text) => {
+  const lowerText = text.toLowerCase();
+  if (lowerText.includes("happy") || lowerText.includes("great") || lowerText.includes("good")) {
+    return "Positive";
+  } else if (lowerText.includes("sad") || lowerText.includes("bad") || lowerText.includes("why")) {
+    return "Negative";
+  }
+  return "Neutral";
+};
+
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -20,7 +31,7 @@ const Chatbot = () => {
           name: "Serenio AI",
           text: "Hello Aman! I'm Serenio AI, your personal assistant. How can I help you today?",
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          sentiment: "Positive",
+          sentiment: null, // No sentiment for initial bot message
         },
       ]);
 
@@ -39,27 +50,27 @@ const Chatbot = () => {
   const handleSend = async () => {
     if (!input.trim()) return;
 
+    const userSentiment = analyzeSentiment(input); // Classify user sentiment
     const userMessage = {
       sender: "user",
       name: "Aman",
       text: input,
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      sentiment: "Neutral",
+      sentiment: userSentiment,
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
 
     try {
-      const res = await api.post("/chat", { message: input });
+      const res = await api.post("/api/chatbot/message", { message: input });
 
       const botReply = {
         sender: "bot",
         name: "Serenio AI",
-        text: res.data.reply || "Sorry, I didn’t understand that.",
+        text: res.data.botReply || "Sorry, I didn’t understand that.",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        // sentiment is still stored but not shown in UI
-        sentiment: res.data.sentiment || "Neutral",
+        sentiment: null, // Ignore bot sentiment from Flask
       };
 
       setMessages((prev) => [...prev, botReply]);
@@ -69,7 +80,7 @@ const Chatbot = () => {
         name: "Serenio AI",
         text: "Oops! Something went wrong while processing your message.",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        sentiment: "Neutral",
+        sentiment: null,
       };
       setMessages((prev) => [...prev, errorReply]);
     }
@@ -85,7 +96,7 @@ const Chatbot = () => {
         name: "Serenio AI",
         text: "Thank you for chatting. Take care! 😊",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        sentiment: "Neutral",
+        sentiment: null,
       },
     ]);
   };
@@ -113,9 +124,11 @@ const Chatbot = () => {
             <div className="message-bubble">{msg.text}</div>
             <div className="meta">
               <span className="time">{msg.time}</span>
-              {/* ✅ Only show Neutral if it's from the user */}
-              {msg.sender === "user" && msg.sentiment === "Neutral" && (
-                <span className="sentiment neutral">{msg.sentiment}</span>
+              {/* Show sentiment only for user messages */}
+              {msg.sender === "user" && msg.sentiment && (
+                <span className={`sentiment ${msg.sentiment.toLowerCase()}`}>
+                  {msg.sentiment}
+                </span>
               )}
             </div>
           </div>
