@@ -1,150 +1,297 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-
-.about-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: "DM Sans", sans-serif;
-  background-color: #E0E7FF;
+.professionals-container {
+  padding: 20px 0;
+  min-height: 100vh;
+  background-color: #f5f7fa; /* Light gray background */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-.about-container h2 {
+h2 {
   text-align: center;
-  color: #1E2A47;
-  margin-bottom: 0.5rem;
-  font-size: 24px;
+  color: #1a2e44; /* Dark navy */
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  font-family: 'Helvetica', sans-serif;
 }
 
-.about-container p {
+p {
   text-align: center;
-  color: #1E2A47;
-  margin-bottom: 1.5rem;
-  font-size: 15px;
-  line-height: 1.6;
+  color: #6b7280; /* Soft gray */
+  margin-bottom: 20px;
+  font-family: 'Helvetica', sans-serif;
+}
+
+.search-filter {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .search-bar {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 1rem;
-  border: 1px solid #E0E7FF;
-  border-radius: 8px;
-  font-size: 14px;
-  background-color: #E0E7FF;
-  color: #1E2A47;
+  padding: 12px;
+  width: 300px;
+  border: 2px solid #3b82f6; /* Blue border */
+  border-radius: 6px;
+  font-size: 1em;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-bar:focus {
+  border-color: #2563eb; /* Darker blue */
 }
 
 .filter-button {
-  padding: 10px 16px;
-  margin-left: 10px;
-  background-color: #1E2A47;
-  color: #E0E7FF;
+  padding: 12px 25px;
+  background-color: #3b82f6; /* Blue button */
+  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
-  margin-top: 0.5rem;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
 }
 
-.psychologist-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.filter-button:hover:not(:disabled) {
+  background-color: #2563eb; /* Darker blue */
+}
+
+.filter-button:disabled {
+  background-color: #d1d5db; /* Light gray */
+  cursor: not-allowed;
+}
+
+.psychologist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 0 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .psychologist-card {
   background-color: white;
-  padding: 1rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(30, 42, 71, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.psychologist-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.psychologist-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 10px;
 }
 
 .psychologist-card h3 {
-  margin: 0;
-  color: #1E2A47;
-  font-size: 18px;
+  color: #1a2e44;
+  font-size: 1.2em;
+  margin: 10px 0;
 }
 
-.psychologist-card p {
-  margin: 2px 0;
-  color: #1E2A47;
-  font-size: 14px;
+.specialization-preview {
+  color: #6b7280;
+  font-size: 0.9em;
+  margin: 5px 0;
 }
 
-.book-button {
-  align-self: flex-start;
-  margin-top: 0.5rem;
-  background-color: #1E2A47;
-  color: #E0E7FF;
+.view-profile {
+  padding: 8px 15px;
+  background-color: #10b981; /* Green */
+  color: white;
   border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.view-profile:hover {
+  background-color: #059669; /* Darker green */
+}
+
+.psychologist-details {
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 30px auto;
+  max-width: 600px;
+  position: relative;
+  animation: slideIn 0.5s ease-out;
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ef4444; /* Red */
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: #dc2626; /* Darker red */
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.profile-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #3b82f6;
+}
+
+.profile-header h3 {
+  color: #1a2e44;
+  font-size: 1.8em;
+  margin: 0;
+}
+
+.specialization {
+  color: #6b7280;
+  font-size: 1.1em;
+  margin: 5px 0;
+}
+
+.profile-bio {
+  margin-bottom: 20px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.profile-info {
+  margin-bottom: 20px;
+}
+
+.profile-info p {
+  color: #4b5563;
+  font-size: 1em;
+  margin: 10px 0;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  color: #1a2e44;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+}
+
+input:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background-color: #10b981; /* Green */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+  background-color: #059669; /* Darker green */
+}
+
+button[type="submit"]:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.success {
+  color: #059669;
+  background-color: #d1fae5;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.error {
+  color: #dc2626;
+  background-color: #fee2e2;
+  padding: 12px;
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 10px;
 }
 
 .load-more {
   display: block;
-  margin: 2rem auto 0;
-  padding: 10px 20px;
-  background-color: #E0E7FF;
-  color: #1E2A47;
+  margin: 30px auto;
+  padding: 12px 25px;
+  background-color: #1a2e44;
+  color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
 }
 
-/* ------------ Responsive Polish ------------ */
-@media (max-width: 768px) {
-  .about-container {
-    padding: 1.5rem 1rem;
-  }
+.load-more:hover {
+  background-color: #12263a;
+}
 
-  .search-bar {
-    width: 100%;
-    font-size: 13px;
+@keyframes slideIn {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
   }
-
-  .filter-button {
-    width: 100%;
-    margin-left: 0;
-    font-size: 13px;
-  }
-
-  .book-button {
-    font-size: 13px;
-    padding: 7px 10px;
-  }
-
-  .load-more {
-    font-size: 14px;
-    width: 100%;
-  }
-
-  .psychologist-card h3 {
-    font-size: 16px;
-  }
-
-  .psychologist-card p {
-    font-size: 13px;
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-@media (max-width: 480px) {
-  .about-container h2 {
-    font-size: 20px;
-  }
-
-  .about-container p {
-    font-size: 14px;
-  }
-
-  .psychologist-card {
-    padding: 0.8rem;
-  }
+.loader-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
 }

@@ -14,6 +14,7 @@ const DashboardHome = () => {
   const [loadingAction, setLoadingAction] = useState(null);      // For chat/book/report
   const [exportLoading, setExportLoading] = useState(false);     // For export button
   const [userAddLoading, setUserAddLoading] = useState(false);   // For add user button
+  const [userRole, setUserRole] = useState("User");             // User role state
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -34,7 +35,18 @@ const DashboardHome = () => {
       }
     };
 
+    const fetchUserRole = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        const res = await api.get(`/api/users/${userId}`);
+        setUserRole(res.data.role || "User");
+      } catch (err) {
+        console.error("Error fetching user role:", err);
+      }
+    };
+
     fetchDashboardData();
+    fetchUserRole();
   }, []);
 
   const handleNavigation = async (path, action) => {
@@ -135,30 +147,37 @@ const DashboardHome = () => {
             >
               {loadingAction === "report" ? <Loader size={16} /> : "📊 Generate Report"}
             </button>
+            {userRole === "Psychologist" && (
+              <button
+                disabled={loadingAction === "profile"}
+                onClick={() => handleNavigation("/psychologist-profile", "profile")}
+              >
+                {loadingAction === "profile" ? <Loader size={16} /> : "📝 Update Profile"}
+              </button>
+            )}
           </div>
         </div>
 
         {/* Admin Tools: Export + Add User */}
-<div className="extra-actions card">
-  <h3>Admin Tools</h3>
-  <div className="actions admin-tool-actions">
-    <button
-      className="admin-btn export-btn"
-      disabled={exportLoading}
-      onClick={handleExport}
-    >
-      {exportLoading ? <Loader size={16} /> : "⬇️ Export Data"}
-    </button>
-    <button
-      className="admin-btn add-user-btn"
-      disabled={userAddLoading}
-      onClick={handleAddUser}
-    >
-      {userAddLoading ? <Loader size={16} /> : "➕ Add User"}
-    </button>
-  </div>
-</div>
-
+        <div className="extra-actions card">
+          <h3>Admin Tools</h3>
+          <div className="actions admin-tool-actions">
+            <button
+              className="admin-btn export-btn"
+              disabled={exportLoading}
+              onClick={handleExport}
+            >
+              {exportLoading ? <Loader size={16} /> : "⬇️ Export Data"}
+            </button>
+            <button
+              className="admin-btn add-user-btn"
+              disabled={userAddLoading}
+              onClick={handleAddUser}
+            >
+              {userAddLoading ? <Loader size={16} /> : "➕ Add User"}
+            </button>
+          </div>
+        </div>
 
         {/* Recent Activity */}
         <div className="recent-activity card">
