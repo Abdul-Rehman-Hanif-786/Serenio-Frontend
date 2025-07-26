@@ -55,25 +55,35 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await api.post("/login", { email, password });
-      const { token, role } = response.data;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", role);
-
-      toast.success("Login successful!", {
-        position: "top-center",
-        autoClose: 3000,
+      const response = await api.post("/api/auth/login", { email, password }, {
+        headers: { 'Content-Type': 'application/json' }
       });
+      console.log("Login request config:", api.defaults);
+      console.log("Login response (full):", response.data);
+      console.log("Login response headers:", response.headers);
 
-      setTimeout(() => {
-        if (role === "admin") {
-          navigate("/AdminDashboard");
-        } else {
-          navigate("/UserDashboard");
-        }
-      }, 1500);
+      const { accessToken } = response.data;
+
+      if (accessToken) {
+        localStorage.setItem("token", accessToken);
+        toast.success("Login successful!", {
+          position: "top-center",
+          autoClose: 3000,
+        });
+
+        // Assume role is in token payload or response; adjust if backend provides role
+        // For now, default to UserDashboard since role isn't provided explicitly
+        setTimeout(() => {
+          navigate("/UserDashboard", { replace: true });
+          console.log("After navigate attempt with delay");
+        }, 1500);
+      } else {
+        console.log("No accessToken in response:", response.data);
+        toast.error("Login failed. Invalid response.", { position: "top-center", autoClose: 3000 });
+      }
     } catch (err) {
+      console.error("Login error (full):", err.response?.data || err.message || err.stack || err);
+      console.log("Error response headers:", err.response?.headers);
       const message = err.response?.data?.message || "Login failed. Please try again.";
       setError(message);
 

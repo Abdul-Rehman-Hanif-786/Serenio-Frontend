@@ -1,16 +1,17 @@
-
+// src/Components/PrivateRoute.js
 import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { jwtDecode } from "jwt-decode"; // ✅ Correct import
+import { jwtDecode } from "jwt-decode";
 
-//🔒 Function to check if token is expired
 const isTokenExpired = (token) => {
   try {
     const { exp } = jwtDecode(token);
+    console.log("Decoded token:", { exp, currentTime: Date.now() / 1000 }); // Debug
     return Date.now() >= exp * 1000;
   } catch (err) {
-    return true; // Treat invalid tokens as expired
+    console.error("Token decode error:", err); // Debug
+    return true;
   }
 };
 
@@ -18,6 +19,8 @@ const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   const location = useLocation();
   const expired = token ? isTokenExpired(token) : true;
+
+  console.log("PrivateRoute - Token:", token ? "Present" : "Missing", "Expired:", expired, "Path:", location.pathname); // Debug
 
   useEffect(() => {
     if (!token || expired) {
@@ -28,10 +31,11 @@ const PrivateRoute = ({ children }) => {
     }
   }, [location.pathname, token, expired]);
 
-  // if (!token || expired) {
-  //   localStorage.removeItem("token");
-  //   return <Navigate to="/login" state={{ from: location }} replace />;
-  // }
+  if (!token || expired) {
+    localStorage.removeItem("token");
+    console.log("PrivateRoute: Redirecting to /login"); // Debug
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
   return children;
 };
