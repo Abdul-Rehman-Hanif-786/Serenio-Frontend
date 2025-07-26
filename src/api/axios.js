@@ -1,8 +1,10 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://your-api-url.com/api", // Change to your real API
-  withCredentials: true,
+  baseURL: process.env.REACT_APP_API_URL, // http://localhost:5000
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.request.use(

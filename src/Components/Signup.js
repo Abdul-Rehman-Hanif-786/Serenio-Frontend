@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  FaUser,
-  FaEnvelope,
-  FaPhoneAlt,
-  FaLock,
-  FaEye,
-  FaEyeSlash,
-} from "react-icons/fa";
+import { FaUser, FaEnvelope, FaPhoneAlt, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "../api/axios";
@@ -96,20 +89,37 @@ const Signup = () => {
     setSignupLoading(true);
 
     try {
-      const res = await api.post("/api/auth/signup", {
+      const res = await api.post("/api/auth/register", {
         name: fullName,
         email,
         phone,
         password,
-      });
+      }, { headers: { 'Content-Type': 'application/json' } });
+      console.log("Signup request config:", api.defaults);
+      console.log("Signup response (full):", res.data);
+      console.log("Signup response headers:", res.headers);
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
+      if (res.data.accessToken) {
+        localStorage.setItem("token", res.data.accessToken);
         toast.success("Account created successfully!", { autoClose: 5000 });
-        setTimeout(() => navigate("/dashboard"), 2000);
+        console.log("Navigating to /UserDashboard with token:", res.data.accessToken);
+        setTimeout(() => {
+          navigate("/UserDashboard", { replace: true });
+          console.log("After navigate attempt with delay");
+        }, 2000);
+      } else if (res.data.message && typeof res.data.message === "string" && res.data.message.toLowerCase().includes("registered successfully")) {
+        toast.success("Account created successfully!", { autoClose: 5000 });
+        console.log("No token, using success message to navigate:", res.data.message);
+        setTimeout(() => {
+          navigate("/UserDashboard", { replace: true });
+          console.log("After navigate attempt with delay");
+        }, 2000);
+      } else {
+        console.log("No token or recognizable success message, response:", res.data);
       }
     } catch (err) {
-      console.error("Signup error:", err);
+      console.error("Signup error (full):", err.response?.data || err.message || err.stack || err);
+      console.log("Error response headers:", err.response?.headers);
       toast.error(
         err?.response?.data?.message || "Signup failed. Please try again.",
         { autoClose: 5000 }
