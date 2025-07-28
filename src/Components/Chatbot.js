@@ -1,9 +1,13 @@
+// ✅ Animated Chatbot using Framer Motion
 import React, { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 import "./Chatbot.css";
 import api from "../api/axios";
 import Loader from "./Loader";
+import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from "react-router-dom";
 
-// Simple sentiment analysis function
+
 const analyzeSentiment = (text) => {
   const lowerText = text.toLowerCase();
   if (lowerText.includes("happy") || lowerText.includes("great") || lowerText.includes("good")) {
@@ -14,7 +18,21 @@ const analyzeSentiment = (text) => {
   return "Neutral";
 };
 
+const messageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 const Chatbot = () => {
+  const navigate = useNavigate();
+  const [sessionId, setSessionId] = useState(() => {
+  const existing = localStorage.getItem("serenioSessionId");
+  if (existing) return existing;
+  const newId = uuidv4();
+  localStorage.setItem("serenioSessionId", newId);
+  return newId;
+  });
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,20 +42,17 @@ const Chatbot = () => {
   useEffect(() => {
     const loadInitial = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1200));
-
       setMessages([
         {
           sender: "bot",
           name: "Serenio AI",
           text: "Hello Aman! I'm Serenio AI, your personal assistant. How can I help you today?",
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          sentiment: null, // No sentiment for initial bot message
+          sentiment: null,
         },
       ]);
-
       setPageLoading(false);
     };
-
     loadInitial();
   }, []);
 
@@ -49,8 +64,7 @@ const Chatbot = () => {
 
   const handleSend = async () => {
     if (!input.trim()) return;
-
-    const userSentiment = analyzeSentiment(input); // Classify user sentiment
+    const userSentiment = analyzeSentiment(input);
     const userMessage = {
       sender: "user",
       name: "Aman",
@@ -58,21 +72,18 @@ const Chatbot = () => {
       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       sentiment: userSentiment,
     };
-
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
 
     try {
-      const res = await api.post("/api/chatbot/message", { message: input });
-
+      const res = await api.post("/api/chatbot/message", { message: input,sessionId });
       const botReply = {
         sender: "bot",
         name: "Serenio AI",
         text: res.data.botReply || "Sorry, I didn’t understand that.",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        sentiment: null, // Ignore bot sentiment from Flask
+        sentiment: null,
       };
-
       setMessages((prev) => [...prev, botReply]);
     } catch (err) {
       const errorReply = {
@@ -89,17 +100,23 @@ const Chatbot = () => {
     setLoading(false);
   };
 
-  const handleEndChat = () => {
-    setMessages([
-      {
-        sender: "bot",
-        name: "Serenio AI",
-        text: "Thank you for chatting. Take care! 😊",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        sentiment: null,
-      },
-    ]);
-  };
+const handleEndChat = () => {
+  setMessages([
+    {
+      sender: "bot",
+      name: "Serenio AI",
+      text: "Thank you for chatting. Take care! 😊",
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      sentiment: null,
+    },
+  ]);
+
+  const sid = localStorage.getItem("serenioSessionId");
+  if (sid) {
+    navigate(`/SentimentAnalysisDashboard`); // Redirect to report
+    localStorage.removeItem("serenioSessionId");
+  }
+};
 
   if (pageLoading) {
     return (
@@ -111,27 +128,41 @@ const Chatbot = () => {
   }
 
   return (
-    <div className="chatbot-container">
-      <div className="chatbot-header">💬 Serenio AI</div>
+    <motion.div
+      className="chatbot-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      <motion.div className="chatbot-header" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+        💬 Serenio AI
+      </motion.div>
 
       <div className="chat-window" ref={chatMessagesRef}>
         {messages.map((msg, idx) => (
-          <div
+          <motion.div
             key={idx}
             className={`message-block ${msg.sender === "user" ? "user-msg" : "bot-msg"}`}
+            variants={messageVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ duration: 0.4, delay: idx * 0.1 }}
           >
             <div className="sender-name">{msg.name}</div>
-            <div className="message-bubble">{msg.text}</div>
+            <motion.div
+              className="message-bubble"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              {msg.text}
+            </motion.div>
             <div className="meta">
               <span className="time">{msg.time}</span>
-              {/* Show sentiment only for user messages */}
               {msg.sender === "user" && msg.sentiment && (
-                <span className={`sentiment ${msg.sentiment.toLowerCase()}`}>
-                  {msg.sentiment}
-                </span>
+                <span className={`sentiment ${msg.sentiment.toLowerCase()}`}>{msg.sentiment}</span>
               )}
             </div>
-          </div>
+          </motion.div>
         ))}
 
         {loading && <Loader />}
@@ -146,17 +177,32 @@ const Chatbot = () => {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
         />
-        <button className="send-button" onClick={handleSend}>
+        <motion.button
+          className="send-button"
+          onClick={handleSend}
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.05 }}
+        >
           Send
-        </button>
+        </motion.button>
       </div>
 
-      <div className="end-chat-wrapper">
-        <button className="end-chat-button" onClick={handleEndChat}>
+      <motion.div
+        className="end-chat-wrapper"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <motion.button
+          className="end-chat-button"
+          onClick={handleEndChat}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           End Chat
-        </button>
-      </div>
-    </div>
+        </motion.button>
+      </motion.div>
+    </motion.div>
   );
 };
 

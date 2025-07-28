@@ -4,7 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
 
 /* Apply DM Sans globally */
-body, .signup-wrapper, .signup-card, input, button, a, p, span, label {
+body, .signup-wrapper, .signup-card, input, button, a, p, span, label, select, textarea {
   font-family: 'DM Sans', sans-serif;
 }
 
@@ -57,6 +57,7 @@ body {
 .input-wrapper {
   position: relative;
   margin-bottom: 12px;
+  text-align: left;
 }
 
 .input-icon {
@@ -68,14 +69,31 @@ body {
   font-size: 14px;
 }
 
-.signup-input {
+.signup-input,
+.signup-select,
+.signup-textarea {
   width: 100%;
-  padding: 12px 40px 12px 36px; /* Adjust for icon space */
+  padding: 12px 40px 12px 36px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
   box-sizing: border-box;
   font-family: 'DM Sans', sans-serif;
+  background-color: #fff;
+}
+
+.signup-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='none' stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.signup-textarea {
+  height: 80px;
+  resize: vertical;
+  padding-left: 12px;
 }
 
 .eye-icon {
@@ -93,7 +111,6 @@ body {
   color: #6b7280;
   text-align: left;
   margin-bottom: 12px;
-  font-family: 'DM Sans', sans-serif;
 }
 
 .checkbox-wrapper {
@@ -104,7 +121,6 @@ body {
   margin-bottom: 16px;
   gap: 8px;
   text-align: left;
-  font-family: 'DM Sans', sans-serif;
 }
 
 .checkbox-wrapper a {
@@ -122,26 +138,45 @@ body {
   font-weight: bold;
   cursor: pointer;
   margin-bottom: 16px;
-  font-family: 'DM Sans', sans-serif;
 }
 
 .error-message {
   color: #dc2626;
   font-size: 13px;
   margin-bottom: 10px;
-  font-family: 'DM Sans', sans-serif;
 }
 
 .signin-link {
   font-size: 13px;
   margin-top: 8px;
   color: #374151;
-  font-family: 'DM Sans', sans-serif;
 }
 
 .link {
   color: #4f46e5;
   text-decoration: none;
   font-weight: bold;
-  font-family: 'DM Sans', sans-serif;
+}
+
+/* Toggle for psychologist registration */
+.toggle-psychologist {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.toggle-psychologist input[type="checkbox"] {
+  accent-color: #4f46e5;
+}
+
+/* Divider for conditional psychologist fields */
+.psychologist-extra {
+  margin-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+  text-align: left;
 }

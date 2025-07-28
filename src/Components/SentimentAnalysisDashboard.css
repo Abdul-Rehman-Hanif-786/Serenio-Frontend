@@ -205,3 +205,20 @@
     max-width: 100%;
   }
 }
+.generate-report-btn {
+  background: linear-gradient(to right, #667eea, #764ba2);
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 14px 32px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 10px 15px rgba(118, 75, 162, 0.3);
+  transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+  margin-top: 30px;
+}
+
+.generate-report-btn:hover {
+  background: linear-gradient(to right, #5a67d8, #6b46c1);
+}

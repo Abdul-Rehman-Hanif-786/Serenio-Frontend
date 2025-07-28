@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FaUser, FaEnvelope, FaPhoneAlt, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhoneAlt,
+  FaLock,
+  FaEye,
+  FaEyeSlash,
+} from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import api from "../api/axios";
 import "./Signup.css";
 import Loader from "./Loader";
+import { motion, AnimatePresence } from "framer-motion";
 
-const Signup = () => {
+const AnimatedSignup = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -19,6 +27,13 @@ const Signup = () => {
   const [signupLoading, setSignupLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [signingIn, setSigningIn] = useState(false);
+  const [isPsychologist, setIsPsychologist] = useState(false);
+  const [specialization, setSpecialization] = useState("");
+  const [experience, setExperience] = useState("");
+  const [availability, setAvailability] = useState("");
+  const [hourlyRate, setHourlyRate] = useState("");
+  const [bio, setBio] = useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,94 +51,49 @@ const Signup = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const namePattern = /^[A-Za-z\s]+$/;
 
-    if (!fullName.trim()) {
-      toast.error("Full name is required.");
-      return;
-    }
-    if (!email.trim()) {
-      toast.error("Email is required.");
-      return;
-    }
-    if (!phone.trim()) {
-      toast.error("Phone number is required.");
-      return;
-    }
-    if (!password.trim()) {
-      toast.error("Password is required.");
-      return;
-    }
-    if (!confirmPassword.trim()) {
-      toast.error("Confirm password is required.");
-      return;
-    }
+    if (!fullName.trim() || fullName.length < 3 || !namePattern.test(fullName))
+      return toast.error("Enter a valid name");
+    if (!email.trim() || !emailPattern.test(email))
+      return toast.error("Enter a valid email");
+    if (!phone.trim().match(/^\d{10,15}$/))
+      return toast.error("Enter a valid phone number");
+    if (!password || password.length < 6)
+      return toast.error("Password must be at least 6 characters");
+    if (password !== confirmPassword)
+      return toast.error("Passwords do not match");
+    if (!agreed)
+      return toast.error("You must agree to the terms and privacy policy");
 
-    if (fullName.trim().length < 3) {
-      toast.error("Full name must be at least 3 characters.");
-      return;
-    }
-    if (!namePattern.test(fullName)) {
-      toast.error("Full name must only contain letters and spaces.");
-      return;
-    }
-    if (!emailPattern.test(email)) {
-      toast.error("Invalid email format.");
-      return;
-    }
-    if (!phone.trim().match(/^\d{10,15}$/)) {
-      toast.error("Enter a valid phone number.");
-      return;
-    }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-    if (!agreed) {
-      toast.error("You must agree to the terms and privacy policy.");
-      return;
-    }
+    const payload = {
+      name: fullName,
+      email,
+      phone,
+      password,
+      role: isPsychologist ? "Psychologist" : "User",
+      ...(isPsychologist && {
+        specialization,
+        experience,
+        availability,
+        hourlyRate,
+        bio,
+      }),
+    };
 
     setSignupLoading(true);
-
     try {
-      const res = await api.post("/api/auth/register", {
-        name: fullName,
-        email,
-        phone,
-        password,
-      }, { headers: { 'Content-Type': 'application/json' } });
-      console.log("Signup request config:", api.defaults);
-      console.log("Signup response (full):", res.data);
-      console.log("Signup response headers:", res.headers);
+      const res = await api.post("/api/auth/register", payload);
 
       if (res.data.accessToken) {
         localStorage.setItem("token", res.data.accessToken);
-        toast.success("Account created successfully!", { autoClose: 5000 });
-        console.log("Navigating to /UserDashboard with token:", res.data.accessToken);
-        setTimeout(() => {
-          navigate("/UserDashboard", { replace: true });
-          console.log("After navigate attempt with delay");
-        }, 2000);
-      } else if (res.data.message && typeof res.data.message === "string" && res.data.message.toLowerCase().includes("registered successfully")) {
-        toast.success("Account created successfully!", { autoClose: 5000 });
-        console.log("No token, using success message to navigate:", res.data.message);
-        setTimeout(() => {
-          navigate("/UserDashboard", { replace: true });
-          console.log("After navigate attempt with delay");
-        }, 2000);
+        toast.success("Account created successfully!");
+        setTimeout(() => navigate("/UserDashboard", { replace: true }), 2000);
       } else {
-        console.log("No token or recognizable success message, response:", res.data);
+        toast.success("Account created, please login.");
+        setTimeout(() => navigate("/login"), 2000);
       }
     } catch (err) {
-      console.error("Signup error (full):", err.response?.data || err.message || err.stack || err);
-      console.log("Error response headers:", err.response?.headers);
-      toast.error(
-        err?.response?.data?.message || "Signup failed. Please try again.",
-        { autoClose: 5000 }
-      );
+      console.error("Signup error:", err.response?.data || err);
+      toast.error(err?.response?.data?.message || "Signup failed.");
     } finally {
       setSignupLoading(false);
     }
@@ -131,9 +101,7 @@ const Signup = () => {
 
   const handleSignInClick = () => {
     setSigningIn(true);
-    setTimeout(() => {
-      navigate("/login");
-    }, 800);
+    setTimeout(() => navigate("/login"), 800);
   };
 
   if (initialLoading) {
@@ -143,40 +111,37 @@ const Signup = () => {
       </div>
     );
   }
-   <div className="hero">
-           <h1>Welcome</h1>
-        </div>
 
   return (
-    
-    <div className="signup-wrapper">
+    <motion.div
+      className="signup-wrapper"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
       <ToastContainer position="top-center" autoClose={5000} theme="colored" />
-
-      <div className="signup-card">
-        <div className="avatar-icon">
-          <img src={require("../assets/signupLogo.png")} alt="logo" className="logo-img" />
-        </div>
+      <motion.div
+        className="signup-card"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 80, damping: 14 }}
+      >
         <h2 className="signup-title">Create Account</h2>
-        <p className="signup-subtitle">Join us today and get started</p>
 
         <div className="input-wrapper">
           <FaUser className="input-icon" />
           <input
             type="text"
-            className="signup-input"
-            placeholder="Enter your full name"
+            placeholder="Full Name"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
         </div>
-       
 
         <div className="input-wrapper">
           <FaEnvelope className="input-icon" />
           <input
             type="email"
-            className="signup-input"
-            placeholder="Enter your email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -186,8 +151,7 @@ const Signup = () => {
           <FaPhoneAlt className="input-icon" />
           <input
             type="text"
-            className="signup-input"
-            placeholder="Enter your phone number"
+            placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
@@ -197,15 +161,11 @@ const Signup = () => {
           <FaLock className="input-icon" />
           <input
             type={showPassword ? "text" : "password"}
-            className="signup-input"
-            placeholder="Create a password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <span
-            className="eye-icon"
-            onClick={() => setShowPassword(!showPassword)}
-          >
+          <span className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </span>
         </div>
@@ -218,8 +178,7 @@ const Signup = () => {
           <FaLock className="input-icon" />
           <input
             type={showConfirmPassword ? "text" : "password"}
-            className="signup-input"
-            placeholder="Confirm your password"
+            placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
@@ -238,26 +197,66 @@ const Signup = () => {
             onChange={() => setAgreed(!agreed)}
           />
           <span>
-            I agree to the{" "}
-            <Link to="/terms" target="_blank" rel="noopener noreferrer">
-              Terms of Service
-            </Link>{" "}
-            and{" "}
-            <Link to="/privacy" target="_blank" rel="noopener noreferrer">
-              Privacy Policy
-            </Link>
+            I agree to the <Link to="/terms">Terms</Link> and{" "}
+            <Link to="/privacy">Privacy Policy</Link>
           </span>
         </div>
 
+        <div className="checkbox-wrapper">
+          <input
+            type="checkbox"
+            checked={isPsychologist}
+            onChange={() => setIsPsychologist(!isPsychologist)}
+          />
+          <span>Register as a Psychologist</span>
+        </div>
+
+        <AnimatePresence>
+          {isPsychologist && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <input
+                placeholder="Specialization"
+                value={specialization}
+                onChange={(e) => setSpecialization(e.target.value)}
+              />
+              <input
+                placeholder="Experience"
+                value={experience}
+                onChange={(e) => setExperience(e.target.value)}
+              />
+              <input
+                placeholder="Availability"
+                value={availability}
+                onChange={(e) => setAvailability(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="Hourly Rate (PKR)"
+                value={hourlyRate}
+                onChange={(e) => setHourlyRate(e.target.value)}
+              />
+              <textarea
+                placeholder="Bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <button
-          className="signup-button"
           onClick={handleSignup}
           disabled={signupLoading}
+          className="signup-button"
         >
           {signupLoading ? (
             <>
-              <Loader size={18} color="#fff" />
-              &nbsp;Creating...
+              <Loader size={18} color="#fff" /> &nbsp;Creating...
             </>
           ) : (
             "Create Account"
@@ -266,11 +265,7 @@ const Signup = () => {
 
         <p className="signin-link">
           Already have an account?{" "}
-          <span
-            onClick={handleSignInClick}
-            className="link"
-            style={{ cursor: "pointer" }}
-          >
+          <span onClick={handleSignInClick} className="link">
             {signingIn ? (
               <>
                 <Loader size={14} color="#000" /> &nbsp;Redirecting...
@@ -280,9 +275,9 @@ const Signup = () => {
             )}
           </span>
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
-export default Signup;
+export default AnimatedSignup;

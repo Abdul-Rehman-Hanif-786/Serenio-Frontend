@@ -246,3 +246,17 @@
     width: 100%;
   }
 }
+.cancel-btn {
+  padding: 5px 10px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-btn:hover {
+  background-color: #dc2626;
+}

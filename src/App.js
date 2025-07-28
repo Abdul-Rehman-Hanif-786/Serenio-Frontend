@@ -8,7 +8,7 @@ import Index from "./Components/Index";
 import Login from "./Components/Login";
 import AdminDashboard from "./Components/AdminDashboard";
 import Signup from "./Components/Signup";
-import SentimentAnalysis from "./Components/SentimentAnalysis";
+import SentimentAnalysisDashboard from "./Components/SentimentAnalysisDashboard";
 import Professionals from "./Components/Professionals";
 import PaymentForm from "./Components/PaymentForm";
 import Chatbot from "./Components/Chatbot";
@@ -17,23 +17,27 @@ import UserDashboard from "./Components/UserDashboard";
 import Loader from "./Components/Loader";
 import PrivateRoute from "./Components/PrivateRoute";
 import Logs from "./Components/Logs";
+import AppointmentForm from "./Components/AppointmentForm";
+import AppointmentDetails from "./Components/AppointmentDetails"; // ← Add if you have appointment page
+import PsychologistDashboard from "./Components/PsychologistDashboard";
+// ✅ Layout Wrapper to conditionally hide Navbar
 
-// ✅ Layout Wrapper to conditionally show Navbar
 const Layout = ({ children }) => {
   const location = useLocation();
 
-  // Only show Navbar on these routes:
-  const showNavbar = ["/", "/login", "/signup"].includes(location.pathname);
+  // Hide navbar on login, signup, index only
+  const hideNavbar = ["/", "/login", "/signup"].includes(location.pathname);
 
   return (
     <>
-      {showNavbar && <Navbar />}
+      {!hideNavbar && <Navbar />}
       {children}
     </>
   );
 };
 
 const App = () => {
+  
   return (
     <Router>
       <Layout>
@@ -41,7 +45,14 @@ const App = () => {
           <Route path="/" element={<Index />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
-
+          <Route
+  path="/my-appointments"
+  element={
+    <PrivateRoute>
+      <AppointmentDetails />
+    </PrivateRoute>
+  }
+/>
           <Route
             path="/AdminDashboard"
             element={
@@ -67,10 +78,10 @@ const App = () => {
             }
           />
           <Route
-            path="/SentimentAnalysis"
+            path="/SentimentAnalysisDashboard"
             element={
               <PrivateRoute>
-                <SentimentAnalysis />
+                <SentimentAnalysisDashboard />
               </PrivateRoute>
             }
           />
@@ -106,8 +117,28 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/appointment-form"
+            element={
+              <PrivateRoute>
+                <AppointmentForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/appointments"
+            element={
+              <PrivateRoute>
+                <AppointmentDetails /> {/* Replace with your actual component */}
+              </PrivateRoute>
+            }
+          />
           <Route path="/Loader" element={<Loader />} />
+          <Route path="/PsychologistDashboard
+          " element={<PsychologistDashboard />} />
+
         </Routes>
+
         <ToastContainer
           position="top-center"
           autoClose={5000}

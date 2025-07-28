@@ -6,8 +6,10 @@ import "./Login.css";
 import { FaEye, FaEyeSlash, FaGoogle, FaFacebookF } from "react-icons/fa";
 import api from "../api/axios";
 import Loader from "./Loader";
+import { jwtDecode } from "jwt-decode";
+import { motion } from "framer-motion";
 
-const Login = () => {
+const AnimatedLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,77 +24,63 @@ const Login = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const isValidEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleLogin = async () => {
     setError("");
 
     if (!email.trim()) {
-      toast.error("Email is required.", { position: "top-center", autoClose: 3000 });
+      toast.error("Email is required.");
       return;
     }
-
     if (!isValidEmail(email)) {
-      toast.error("Enter a valid email address.", { position: "top-center", autoClose: 3000 });
+      toast.error("Enter a valid email address.");
       return;
     }
-
     if (!password.trim()) {
-      toast.error("Password is required.", { position: "top-center", autoClose: 3000 });
+      toast.error("Password is required.");
       return;
     }
-
-    const rememberMe = document.getElementById("rememberMeCheckbox").checked;
-    if (!rememberMe) {
-      toast.warn("Please check 'Remember me' before logging in.", {
-        position: "top-center",
-        autoClose: 3000,
-      });
+    if (!document.getElementById("rememberMeCheckbox").checked) {
+      toast.warn("Please check 'Remember me' before logging in.");
       return;
     }
 
     setLoading(true);
-
     try {
       const response = await api.post("/api/auth/login", { email, password }, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" }
       });
-      console.log("Login request config:", api.defaults);
-      console.log("Login response (full):", response.data);
-      console.log("Login response headers:", response.headers);
 
-      const { accessToken } = response.data;
+      const { accessToken, refreshToken } = response.data;
 
       if (accessToken) {
         localStorage.setItem("token", accessToken);
-        toast.success("Login successful!", {
-          position: "top-center",
-          autoClose: 3000,
-        });
+        localStorage.setItem("refreshToken", refreshToken);
 
-        // Assume role is in token payload or response; adjust if backend provides role
-        // For now, default to UserDashboard since role isn't provided explicitly
+        const decoded = jwtDecode(accessToken);
+        const { userId, role } = decoded;
+
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("role", role);
+
+        toast.success("Login successful!");
         setTimeout(() => {
-          navigate("/UserDashboard", { replace: true });
-          console.log("After navigate attempt with delay");
+          navigate(role === "Psychologist" ? "/PsychologistDashboard" : "/UserDashboard", { replace: true });
         }, 1500);
       } else {
-        console.log("No accessToken in response:", response.data);
-        toast.error("Login failed. Invalid response.", { position: "top-center", autoClose: 3000 });
+        toast.error("Login failed. Invalid response.");
       }
     } catch (err) {
-      console.error("Login error (full):", err.response?.data || err.message || err.stack || err);
-      console.log("Error response headers:", err.response?.headers);
       const message = err.response?.data?.message || "Login failed. Please try again.";
       setError(message);
 
       if (message.toLowerCase().includes("email")) {
-        toast.error("Email not found. Please sign up first.", { position: "top-center" });
+        toast.error("Email not found. Please sign up first.");
       } else if (message.toLowerCase().includes("password")) {
-        toast.error("Incorrect password. Please try again.", { position: "top-center" });
+        toast.error("Incorrect password.");
       } else {
-        toast.error(message, { position: "top-center" });
+        toast.error(message);
       }
     } finally {
       setLoading(false);
@@ -102,24 +90,52 @@ const Login = () => {
   if (pageLoading) return <Loader />;
 
   return (
-    <div className="login-wrapper">
+    <motion.div
+      className="login-wrapper"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
       <ToastContainer theme="colored" position="top-center" autoClose={5000} />
-
-      <div className="login-card">
-        <h2 className="login-title">
+      <motion.div
+        className="login-card"
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <motion.h2
+          className="login-title"
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
           <img src={require("../assets/signupLogo.png")} alt="logo" className="logo-img" />
-        </h2>
-        <p className="login-subtitle">Please sign in to your account</p>
+        </motion.h2>
 
-        <input
+        <motion.p
+          className="login-subtitle"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          Please sign in to your account
+        </motion.p>
+
+        <motion.input
           type="email"
           className="login-input"
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
         />
 
-        <div className="password-wrapper">
+        <motion.div
+          className="password-wrapper"
+          initial={{ x: -50, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
           <input
             type={showPassword ? "text" : "password"}
             className="login-input"
@@ -130,48 +146,60 @@ const Login = () => {
           <span className="eye-icon" onClick={() => setShowPassword((prev) => !prev)}>
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </span>
-        </div>
+        </motion.div>
 
         {error && <p className="error-message">{error}</p>}
 
-        <div className="login-options">
+        <motion.div
+          className="login-options"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           <label>
             <input type="checkbox" id="rememberMeCheckbox" /> Remember me
           </label>
-          <Link to="/forgot" className="forgot-link">
-            Forgot Password?
-          </Link>
-        </div>
+          <Link to="/forgot" className="forgot-link">Forgot Password?</Link>
+        </motion.div>
 
         {loading ? (
           <Loader />
         ) : (
-          <button className="login-button" onClick={handleLogin}>
+          <motion.button
+            className="login-button"
+            onClick={handleLogin}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+          >
             Log In
-          </button>
+          </motion.button>
         )}
 
         <div className="divider">or</div>
 
-        <button className="social-button google">
+        <motion.button
+          className="social-button google"
+          whileHover={{ scale: 1.02 }}
+        >
           <FaGoogle className="social-icon" />
           Continue with Google
-        </button>
+        </motion.button>
 
-        <button className="social-button facebook">
+        <motion.button
+          className="social-button facebook"
+          whileHover={{ scale: 1.02 }}
+        >
           <FaFacebookF className="social-icon" />
           Continue with Facebook
-        </button>
+        </motion.button>
 
         <p className="signup-text">
           Don’t have an account?{" "}
-          <Link to="/signup" className="signup-link">
-            Sign up
-          </Link>
+          <Link to="/signup" className="signup-link">Sign up</Link>
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
-export default Login;
+export default AnimatedLogin;
