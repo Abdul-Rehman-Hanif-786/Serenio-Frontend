@@ -14,6 +14,16 @@ import api from "../api/axios";
 import "./Signup.css";
 import Loader from "./Loader";
 import { motion, AnimatePresence } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
+
+const fieldVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.05, duration: 0.4, ease: "easeOut" },
+  }),
+};
 
 const AnimatedSignup = () => {
   const [fullName, setFullName] = useState("");
@@ -85,8 +95,14 @@ const AnimatedSignup = () => {
 
       if (res.data.accessToken) {
         localStorage.setItem("token", res.data.accessToken);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
+        const decoded = jwtDecode(res.data.accessToken);
+        localStorage.setItem("userId", decoded.userId);
+        localStorage.setItem("role", decoded.role);
         toast.success("Account created successfully!");
-        setTimeout(() => navigate("/UserDashboard", { replace: true }), 2000);
+        setTimeout(() => {
+          navigate(decoded.role === "Psychologist" ? "/PsychologistDashboard" : "/UserDashboard", { replace: true });
+        }, 2000);
       } else {
         toast.success("Account created, please login.");
         setTimeout(() => navigate("/login"), 2000);
@@ -112,6 +128,18 @@ const AnimatedSignup = () => {
     );
   }
 
+  const inputFields = [
+    {
+      icon: <FaUser className="input-icon" />, placeholder: "Full Name", value: fullName, setter: setFullName, type: "text"
+    },
+    {
+      icon: <FaEnvelope className="input-icon" />, placeholder: "Email", value: email, setter: setEmail, type: "email"
+    },
+    {
+      icon: <FaPhoneAlt className="input-icon" />, placeholder: "Phone Number", value: phone, setter: setPhone, type: "text"
+    },
+  ];
+
   return (
     <motion.div
       className="signup-wrapper"
@@ -127,35 +155,24 @@ const AnimatedSignup = () => {
       >
         <h2 className="signup-title">Create Account</h2>
 
-        <div className="input-wrapper">
-          <FaUser className="input-icon" />
-          <input
-            type="text"
-            placeholder="Full Name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-        </div>
-
-        <div className="input-wrapper">
-          <FaEnvelope className="input-icon" />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-
-        <div className="input-wrapper">
-          <FaPhoneAlt className="input-icon" />
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
+        {inputFields.map((field, i) => (
+          <motion.div
+            className="input-wrapper"
+            key={field.placeholder}
+            custom={i}
+            variants={fieldVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {field.icon}
+            <input
+              type={field.type}
+              placeholder={field.placeholder}
+              value={field.value}
+              onChange={(e) => field.setter(e.target.value)}
+            />
+          </motion.div>
+        ))}
 
         <div className="input-wrapper">
           <FaLock className="input-icon" />
@@ -190,25 +207,29 @@ const AnimatedSignup = () => {
           </span>
         </div>
 
-        <div className="checkbox-wrapper">
-          <input
-            type="checkbox"
-            checked={agreed}
-            onChange={() => setAgreed(!agreed)}
-          />
-          <span>
-            I agree to the <Link to="/terms">Terms</Link> and{" "}
-            <Link to="/privacy">Privacy Policy</Link>
-          </span>
+        <div className="checkbox-container">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={() => setAgreed(!agreed)}
+            />
+            <span>
+              I agree to the <Link to="/terms">Terms</Link> and{" "}
+              <Link to="/privacy">Privacy Policy</Link>
+            </span>
+          </label>
         </div>
 
-        <div className="checkbox-wrapper">
-          <input
-            type="checkbox"
-            checked={isPsychologist}
-            onChange={() => setIsPsychologist(!isPsychologist)}
-          />
-          <span>Register as a Psychologist</span>
+        <div className="checkbox-container">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={isPsychologist}
+              onChange={() => setIsPsychologist(!isPsychologist)}
+            />
+            <span>Register as a Psychologist</span>
+          </label>
         </div>
 
         <AnimatePresence>

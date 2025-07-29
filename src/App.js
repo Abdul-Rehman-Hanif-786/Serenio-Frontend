@@ -17,15 +17,15 @@ import UserDashboard from "./Components/UserDashboard";
 import Loader from "./Components/Loader";
 import PrivateRoute from "./Components/PrivateRoute";
 import Logs from "./Components/Logs";
+import MoodTracker from './Components/MoodTracker';
 import AppointmentForm from "./Components/AppointmentForm";
-import AppointmentDetails from "./Components/AppointmentDetails"; // ← Add if you have appointment page
+import AppointmentDetails from "./Components/AppointmentDetails";
 import PsychologistDashboard from "./Components/PsychologistDashboard";
-// ✅ Layout Wrapper to conditionally hide Navbar
+import AppointmentBooking from './Components/AppointmentBooking';
+import MyAppointments from './Components/MyAppointments';
 
 const Layout = ({ children }) => {
   const location = useLocation();
-
-  // Hide navbar on login, signup, index only
   const hideNavbar = ["/", "/login", "/signup"].includes(location.pathname);
 
   return (
@@ -37,7 +37,10 @@ const Layout = ({ children }) => {
 };
 
 const App = () => {
-  
+  const handleBookingSuccess = (appointment) => {
+    console.log('Appointment booked:', appointment);
+  };
+
   return (
     <Router>
       <Layout>
@@ -45,14 +48,20 @@ const App = () => {
           <Route path="/" element={<Index />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
+
           <Route
-  path="/my-appointments"
-  element={
-    <PrivateRoute>
-      <AppointmentDetails />
-    </PrivateRoute>
-  }
-/>
+            path="/my-appointments"
+            element={
+              <PrivateRoute>
+                <MyAppointments />
+              </PrivateRoute>
+            }
+          />
+
+          <Route path="/sentimentAnalysisDashboard/:sessionId" element={<SentimentAnalysisDashboard />} />
+
+          <Route path="/mood-tracker" element={<MoodTracker />} />
+
           <Route
             path="/AdminDashboard"
             element={
@@ -74,14 +83,6 @@ const App = () => {
             element={
               <PrivateRoute>
                 <Chatbot />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/SentimentAnalysisDashboard"
-            element={
-              <PrivateRoute>
-                <SentimentAnalysisDashboard />
               </PrivateRoute>
             }
           />
@@ -129,14 +130,33 @@ const App = () => {
             path="/appointments"
             element={
               <PrivateRoute>
-                <AppointmentDetails /> {/* Replace with your actual component */}
+                <AppointmentDetails />
               </PrivateRoute>
             }
           />
+          <Route
+            path="/appointment-booking"
+            element={
+              <PrivateRoute>
+                <AppointmentBooking
+                  psychologistId="psychologist_id_here"
+                  psychologistName="Dr. John Doe"
+                  onBookingSuccess={handleBookingSuccess}
+                />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/my-appointments-list"
+            element={
+              <PrivateRoute>
+                <MyAppointments />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/Loader" element={<Loader />} />
-          <Route path="/PsychologistDashboard
-          " element={<PsychologistDashboard />} />
-
+          <Route path="/PsychologistDashboard" element={<PsychologistDashboard />} />
         </Routes>
 
         <ToastContainer

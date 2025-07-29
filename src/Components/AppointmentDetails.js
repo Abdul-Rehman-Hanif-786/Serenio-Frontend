@@ -26,22 +26,25 @@ const AppointmentDetails = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const res = await api.get("/api/appointments/my");
-        setAppointments(res.data.appointments || []);
-      } catch (err) {
-        console.error("Error fetching appointments:", err);
-        setError("Failed to load appointments");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
-
+useEffect(() => {
+  const fetchAppointments = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Token:", token); // Debug: Check token
+      const res = await api.get("/api/appointments/my", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Appointments Response:", res.data); // Debug: Inspect response
+      setAppointments(res.data.appointments || []);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+      setError("Failed to load appointments");
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchAppointments();
+}, []);
   if (loading) return <Loader />;
   if (error) return <p className="error-message">{error}</p>;
 
@@ -83,15 +86,16 @@ const AppointmentDetails = () => {
                 <p><strong>Specialization:</strong> {a.psychologistId?.specialization || "N/A"}</p>
                 <p><strong>Date:</strong> {new Date(a.date).toLocaleDateString()}</p>
                 <p><strong>Time:</strong> {a.timeSlot}</p>
+                <p><strong>Payment Status:</strong> {a.paymentId?.paymentStatus || "N/A"}</p>
                 <p>
-                  Status:{" "}
+                  <strong>Status:</strong>{" "}
                   <span
                     className={`status-badge ${
                       a.status === "Booked"
                         ? "status-booked"
                         : a.status === "Cancelled"
                         ? "status-cancelled"
-                        : ""
+                        : "status-completed"
                     }`}
                   >
                     {a.status}

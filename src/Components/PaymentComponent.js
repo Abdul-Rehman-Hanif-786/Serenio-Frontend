@@ -1,4 +1,3 @@
-// ✅ Animated PaymentComponent.js using Framer Motion
 import React, { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { motion } from "framer-motion";
@@ -22,7 +21,7 @@ const PaymentComponent = ({ amount, currency, onSuccess }) => {
         currency,
       });
 
-      const clientSecret = data.clientSecret;
+      const { clientSecret, paymentIntentId } = data;
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement),
@@ -32,7 +31,7 @@ const PaymentComponent = ({ amount, currency, onSuccess }) => {
       if (result.error) {
         setError(result.error.message);
       } else if (result.paymentIntent.status === "succeeded") {
-        onSuccess();
+        onSuccess({ paymentIntentId }); // Pass paymentIntentId to parent
       }
     } catch (err) {
       setError("Payment failed");

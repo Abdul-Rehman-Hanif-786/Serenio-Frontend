@@ -41,10 +41,6 @@ const AnimatedLogin = () => {
       toast.error("Password is required.");
       return;
     }
-    if (!document.getElementById("rememberMeCheckbox").checked) {
-      toast.warn("Please check 'Remember me' before logging in.");
-      return;
-    }
 
     setLoading(true);
     try {
@@ -66,7 +62,13 @@ const AnimatedLogin = () => {
 
         toast.success("Login successful!");
         setTimeout(() => {
-          navigate(role === "Psychologist" ? "/PsychologistDashboard" : "/UserDashboard", { replace: true });
+          if (role === "Admin") {
+            navigate("/admin/dashboard", { replace: true });
+          } else if (role === "Psychologist") {
+            navigate("/PsychologistDashboard", { replace: true });
+          } else {
+            navigate("/UserDashboard", { replace: true });
+          }
         }, 1500);
       } else {
         toast.error("Login failed. Invalid response.");
@@ -156,9 +158,6 @@ const AnimatedLogin = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <label>
-            <input type="checkbox" id="rememberMeCheckbox" /> Remember me
-          </label>
           <Link to="/forgot" className="forgot-link">Forgot Password?</Link>
         </motion.div>
 

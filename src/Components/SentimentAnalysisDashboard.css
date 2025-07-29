@@ -222,3 +222,8 @@
 .generate-report-btn:hover {
   background: linear-gradient(to right, #5a67d8, #6b46c1);
 }
+.text-blue-600 underline ml-2
+{
+  color: #065f46;
+  background-color: #6b21a8;
+}

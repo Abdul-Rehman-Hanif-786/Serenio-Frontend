@@ -1,12 +1,10 @@
-// ✅ Animated Chatbot using Framer Motion
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import "./Chatbot.css";
 import api from "../api/axios";
 import Loader from "./Loader";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
-
 
 const analyzeSentiment = (text) => {
   const lowerText = text.toLowerCase();
@@ -26,13 +24,12 @@ const messageVariants = {
 const Chatbot = () => {
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState(() => {
-  const existing = localStorage.getItem("serenioSessionId");
-  if (existing) return existing;
-  const newId = uuidv4();
-  localStorage.setItem("serenioSessionId", newId);
-  return newId;
+    const existing = localStorage.getItem("serenioSessionId");
+    if (existing) return existing;
+    const newId = uuidv4();
+    localStorage.setItem("serenioSessionId", newId);
+    return newId;
   });
-
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -76,7 +73,15 @@ const Chatbot = () => {
     setLoading(true);
 
     try {
-      const res = await api.post("/api/chatbot/message", { message: input,sessionId });
+      // Save user message to backend
+      await api.post("/api/chatlogs", {
+        sessionId,
+        message: input,
+        response: "", // Will be updated with bot response
+      });
+
+      // Simulate bot response (replace with actual API call if needed)
+      const res = await api.post("/api/chatbot/message", { message: input, sessionId });
       const botReply = {
         sender: "bot",
         name: "Serenio AI",
@@ -84,6 +89,12 @@ const Chatbot = () => {
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         sentiment: null,
       };
+
+      // Update chat log with bot response
+      await api.patch(`/api/chatlogs/${sessionId}/last`, {
+        response: botReply.text,
+      });
+
       setMessages((prev) => [...prev, botReply]);
     } catch (err) {
       const errorReply = {
@@ -100,23 +111,24 @@ const Chatbot = () => {
     setLoading(false);
   };
 
-const handleEndChat = () => {
-  setMessages([
-    {
-      sender: "bot",
-      name: "Serenio AI",
-      text: "Thank you for chatting. Take care! 😊",
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      sentiment: null,
-    },
-  ]);
+  const handleEndChat = () => {
+    setMessages([
+      {
+        sender: "bot",
+        name: "Serenio AI",
+        text: "Thank you for chatting. Take care! 😊",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        sentiment: null,
+      },
+    ]);
 
-  const sid = localStorage.getItem("serenioSessionId");
-  if (sid) {
-    navigate(`/SentimentAnalysisDashboard`); // Redirect to report
-    localStorage.removeItem("serenioSessionId");
-  }
-};
+    const sid = localStorage.getItem("serenioSessionId");
+    if (sid) {
+      navigate(`/SentimentAnalysisDashboard/${sid}`); // Redirect with sessionId
+      // Optionally clear sessionId after navigation if you want a new session next time
+      // localStorage.removeItem("serenioSessionId");
+    }
+  };
 
   if (pageLoading) {
     return (

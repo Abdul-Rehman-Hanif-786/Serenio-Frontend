@@ -1,216 +1,269 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './AdminDashboard.css';
-import api from '../api/axios';
-import Loader from './Loader';
+import React, { useEffect, useState } from "react";
+import axios from "../api/axios";
+import { motion } from "framer-motion";
+import Loader from "./Loader";
+import "./AdminDashboard.css";
 
-const Dashboard = () => {
-  const navigate = useNavigate();
+const AdminDashboard = () => {
+  const [data, setData] = useState({
+    chatLogs: [],
+    appointments: [],
+    transactions: [],
+    payments: [],
+    psychologists: [],
+    users: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
 
-  const [stats, setStats] = useState({});
-  const [activityLogs, setActivityLogs] = useState([]);
-  const [userList, setUserList] = useState([]);
-  const [loadingPage, setLoadingPage] = useState(true);
-  const [exportLoading, setExportLoading] = useState(false);
-  const [addUserLoading, setAddUserLoading] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [toggleHovered, setToggleHovered] = useState(false);
-
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const statsRes = await api.get("/dashboard/stats");
-        const logsRes = await api.get("/dashboard/activity");
-        const usersRes = await api.get("/dashboard/users");
-
-        setStats(statsRes.data);
-        setActivityLogs(logsRes.data);
-        setUserList(usersRes.data);
-      } catch (err) {
-        console.error("Dashboard data fetch error:", err);
-
-        if (err.response?.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.setItem("loginMessage", "Session expired. Please login again.");
-          navigate('/login');
-        }
-      } finally {
-        setLoadingPage(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, [navigate]);
-
-  const handleExport = async () => {
-    setExportLoading(true);
+  const handleLogin = async () => {
     try {
-      await new Promise((r) => setTimeout(r, 1000));
+      const res = await axios.post("/api/admin/simple-dashboard", {
+        email: credentials.email,
+        password: credentials.password,
+      });
+      setData(res.data);
+      setLoading(false);
     } catch (err) {
-      console.error("Export error", err);
-    } finally {
-      setExportLoading(false);
+      console.error("Failed to fetch dashboard data:", err);
+      setError(err.response?.data?.message || "Failed to load dashboard data. Ensure correct admin credentials.");
+      setLoading(false);
     }
   };
 
-  const handleAddUser = async () => {
-    setAddUserLoading(true);
-    try {
-      await new Promise((r) => setTimeout(r, 1000));
-    } catch (err) {
-      console.error("Add user error", err);
-    } finally {
-      setAddUserLoading(false);
-    }
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  if (loadingPage) {
+  if (loading) {
     return (
-      <div className="full-page-loader">
-        <Loader size={40} />
+      <div className="admin-login-container">
+        <h2>Admin Login</h2>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={credentials.email}
+          onChange={handleChange}
+          className="admin-login-input"
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={credentials.password}
+          onChange={handleChange}
+          className="admin-login-input"
+        />
+        <button onClick={handleLogin} className="admin-login-button">
+          Login
+        </button>
+        {error && <p className="error-message">{error}</p>}
       </div>
     );
   }
 
   return (
-    <div className="dashboard-layout">
-      {sidebarVisible && (
-        <aside className="sidebar">
-          {/* <div className="sidebar-header">
-            <img src={require("../assets/DashboardLogo.png")} alt="logo" className="logo-img" />
-          </div> */}
-          <nav className="sidebar-nav">
-            <ul>
-              <li><a href="/UserDashboard">UserDashboard</a></li>
-              <li><a href="/Professionals">Professionals</a></li>
-              <li><a href="/SentimentAnalysis">Sentiment Analysis</a></li>
-              <li><a href="/profile">Profile setting</a></li>
-              <li><a href="/Logs">SystemMonitoringLogs</a></li>
-            </ul>
-          </nav>
-        </aside>
-      )}
+    <motion.div
+      className="admin-dashboard-container"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.h1 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+        Admin Dashboard
+      </motion.h1>
 
-      <main className="dashboard-content">
-        
-        <nav className="admin-navbar">
-          <div className="sidebar-header">
-            <img src={require("../assets/DashboardLogo.png")} alt="logo" className="logo-img" />
-          </div>
-          <div className="admin-navbar-content">
-            <h1>Admin Dashboard</h1>
-            <p>Monitor user activities and manage system logs</p>
-          </div>
-        </nav>
-
-        <div
-          className="sidebar-toggle-container"
-          onMouseEnter={() => setToggleHovered(true)}
-          onMouseLeave={() => setToggleHovered(false)}
-        >
-          {toggleHovered && (
-            <button
-              className="sidebar-toggle"
-              onClick={() => setSidebarVisible((prev) => !prev)}
-            >
-              &#9776;
-            </button>
-          )}
-        </div>
-
-        <div className="dashboard-cards">
-          <div className="card"><p>Total Users</p><h2>{stats.totalUsers || 'Loading...'}</h2></div>
-          <div className="card"><p>Active Sessions</p><h2>{stats.activeSessions || 'Loading...'}</h2></div>
-          <div className="card"><p>Today's Actions</p><h2>{stats.todaysActions || 'Loading...'}</h2></div>
-          <div className="card"><p>System Health</p><h2 className="success">{stats.systemHealth || 'Loading...'}</h2></div>
-        </div>
-
-        <div className="activity-section">
-          <div className="section-header">
-            <h3>Activity Logs</h3>
-            <div className="actions">
-              <input type="text" placeholder="Search logs..." />
-              <select><option>All Roles</option></select>
-              <select><option>All Actions</option></select>
-              <button className="export-btn" onClick={handleExport} disabled={exportLoading}>
-                {exportLoading ? <Loader size={16} /> : "Export"}
-              </button>
-            </div>
-          </div>
-
-          <table className="activity-table">
+      <section className="dashboard-section">
+        <h2>Users</h2>
+        {data.users.length === 0 ? (
+          <p>No users available.</p>
+        ) : (
+          <table>
             <thead>
               <tr>
-                <th>User</th>
+                <th>Name</th>
+                <th>Email</th>
                 <th>Role</th>
-                <th>Action</th>
-                <th>Timestamp</th>
-                <th>Status</th>
+                <th>Created At</th>
               </tr>
             </thead>
             <tbody>
-              {activityLogs.length > 0 ? (
-                activityLogs.map((log, idx) => (
-                  <tr key={idx}>
-                    <td><strong>{log.name}</strong><br />{log.email}</td>
-                    <td><span className={`badge ${log.role.toLowerCase()}`}>{log.role}</span></td>
-                    <td>{log.action}</td>
-                    <td>{log.timestamp}</td>
-                    <td><span className={`status ${log.status.toLowerCase()}`}>{log.status}</span></td>
-                  </tr>
-                ))
-              ) : (
-                <tr><td colSpan="5">Loading...</td></tr>
-              )}
+              {data.users.map((user) => (
+                <tr key={user._id}>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td>{new Date(user.createdAt).toLocaleString()}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
-        </div>
+        )}
+      </section>
 
-        <div className="user-management">
-          <div className="section-header">
-            <h3>User Management</h3>
-            <div className="actions">
-              <input type="text" placeholder="Search users..." />
-              <select><option>All Status</option></select>
-              <button className="add-user" onClick={handleAddUser} disabled={addUserLoading}>
-                {addUserLoading ? <Loader size={16} /> : "+ Add User"}
-              </button>
-            </div>
-          </div>
-
-          <table className="user-table">
+      <section className="dashboard-section">
+        <h2>Chat Logs</h2>
+        {data.chatLogs.length === 0 ? (
+          <p>No chat logs available.</p>
+        ) : (
+          <table>
             <thead>
               <tr>
                 <th>User</th>
-                <th>Role</th>
-                <th>Last Active</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>Session ID</th>
+                <th>Message</th>
+                <th>Response</th>
+                <th>Sentiment</th>
+                <th>Date</th>
               </tr>
             </thead>
             <tbody>
-              {userList.length > 0 ? (
-                userList.map((user, idx) => (
-                  <tr key={idx}>
-                    <td><strong>{user.name}</strong><br />{user.email}</td>
-                    <td><span className={`badge ${user.role.toLowerCase()}`}>{user.role}</span></td>
-                    <td>{user.lastActive}</td>
-                    <td><span className={`status ${user.status.toLowerCase()}`}>{user.status}</span></td>
-                    <td>
-                      <span className="action-btn">Edit</span>{" "}
-                      <span className="action-btn danger">Suspend</span>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr><td colSpan="5">Loading users...</td></tr>
-              )}
+              {data.chatLogs.map((log) => (
+                <tr key={log._id}>
+                  <td>{log.userId?.name || "Unknown"}</td>
+                  <td>{log.sessionId}</td>
+                  <td>{log.message}</td>
+                  <td>{log.response?.text || "N/A"}</td>
+                  <td>{log.sentiment || "N/A"}</td>
+                  <td>{new Date(log.createdAt).toLocaleString()}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
-        </div>
-      </main>
-    </div>
+        )}
+      </section>
+
+      <section className="dashboard-section">
+        <h2>Appointments</h2>
+        {data.appointments.length === 0 ? (
+          <p>No appointments available.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Psychologist</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Payment Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.appointments.map((appt) => (
+                <tr key={appt._id}>
+                  <td>{appt.userId?.name || "Unknown"}</td>
+                  <td>{appt.psychologistId?.name || "Unknown"} ({appt.psychologistId?.specialization})</td>
+                  <td>{appt.date}</td>
+                  <td>{appt.timeSlot}</td>
+                  <td>{appt.reason || "N/A"}</td>
+                  <td>{appt.status}</td>
+                  <td>{appt.paymentId?.paymentStatus || "N/A"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="dashboard-section">
+        <h2>Transactions</h2>
+        {data.transactions.length === 0 ? (
+          <p>No transactions available.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Stripe Payment ID</th>
+                <th>Amount (PKR)</th>
+                <th>Currency</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.transactions.map((tx) => (
+                <tr key={tx._id}>
+                  <td>{tx.userId?.name || "Unknown"}</td>
+                  <td>{tx.stripePaymentId}</td>
+                  <td>{(tx.amount / 100).toFixed(2)}</td>
+                  <td>{tx.currency.toUpperCase()}</td>
+                  <td>{tx.status}</td>
+                  <td>{new Date(tx.createdAt).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="dashboard-section">
+        <h2>Payments</h2>
+        {data.payments.length === 0 ? (
+          <p>No payments available.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Appointment</th>
+                <th>Amount (PKR)</th>
+                <th>Method</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.payments.map((payment) => (
+                <tr key={payment._id}>
+                  <td>{payment.userId?.name || "Unknown"}</td>
+                  <td>{payment.appointmentId ? `${payment.appointmentId.date} ${payment.appointmentId.timeSlot}` : "N/A"}</td>
+                  <td>{payment.amount.toFixed(2)}</td>
+                  <td>{payment.paymentMethod}</td>
+                  <td>{payment.paymentStatus}</td>
+                  <td>{new Date(payment.timestamp).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+
+      <section className="dashboard-section">
+        <h2>Psychologists</h2>
+        {data.psychologists.length === 0 ? (
+          <p>No psychologists available.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Specialization</th>
+                <th>Hourly Rate (PKR)</th>
+                <th>Experience</th>
+                <th>Rating</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.psychologists.map((psy) => (
+                <tr key={psy._id}>
+                  <td>{psy.name}</td>
+                  <td>{psy.specialization}</td>
+                  <td>{psy.hourlyRate.toFixed(2)}</td>
+                  <td>{psy.experience || "N/A"}</td>
+                  <td>{psy.rating || "N/A"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+    </motion.div>
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;
