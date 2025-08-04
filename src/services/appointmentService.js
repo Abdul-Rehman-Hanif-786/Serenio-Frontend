@@ -45,7 +45,7 @@ export const appointmentService = {
 
   // Get user's appointments
   getMyAppointments: async () => {
-    const response = await appointmentAPI.get('/my-appointments');
+    const response = await appointmentAPI.get('/ntments');
     return response.data;
   },
 

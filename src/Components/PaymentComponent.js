@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import Loader from "./Loader";
 
 const PaymentComponent = ({ amount, currency, onSuccess }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,9 +18,18 @@ const PaymentComponent = ({ amount, currency, onSuccess }) => {
     setError("");
 
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Please log in to make a payment");
+        setTimeout(() => navigate("/login"), 2000);
+        return;
+      }
+
       const { data } = await api.post("/api/payment/create-payment-intent", {
-        amount,
+        amount: currency === "pkr" ? amount * 100 : amount, // Convert PKR to paisa
         currency,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       const { clientSecret, paymentIntentId } = data;
@@ -34,8 +45,19 @@ const PaymentComponent = ({ amount, currency, onSuccess }) => {
         onSuccess({ paymentIntentId }); // Pass paymentIntentId to parent
       }
     } catch (err) {
-      setError("Payment failed");
-      console.error(err);
+      console.error("Payment error:", err);
+      
+      if (err.response?.status === 403) {
+        setError("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        setTimeout(() => navigate("/login"), 2000);
+      } else if (err.response?.status === 401) {
+        setError("Authentication failed. Please log in again.");
+        localStorage.removeItem("token");
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        setError(err.response?.data?.error || "Payment failed. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

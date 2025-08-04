@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL, // http://localhost:5000
+  baseURL: "http://localhost:5000", // Direct baseURL for local development
   headers: {
     "Content-Type": "application/json",
   },
@@ -14,16 +14,22 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Request:", config.url, config.headers); // Debug
+    console.log("Request:", config.method?.toUpperCase(), config.url, config.headers); // Debug
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error("Request error:", error);
+    return Promise.reject(error);
+  }
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log("Response success:", response.status, response.config.url);
+    return response;
+  },
   (error) => {
-    console.log("Response error:", error.response?.status, error.response?.data); // Debug
+    console.error("Response error:", error.response?.status, error.response?.data, error.config?.url);
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
       console.log("Interceptor: Redirecting to /login due to 401");

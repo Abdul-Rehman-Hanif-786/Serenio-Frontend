@@ -71,7 +71,7 @@ function Professionals() {
     setTimeout(() => {
       navigate("/appointment-form", {
         state: {
-          psychologistId: selectedPsychologist._id,
+          psychologist: selectedPsychologist,
           date: bookingForm.date,
           timeSlot: bookingForm.timeSlot,
         },

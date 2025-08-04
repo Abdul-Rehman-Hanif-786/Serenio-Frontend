@@ -15,10 +15,11 @@ const isTokenExpired = (token) => {
   }
 };
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, role }) => {
   const token = localStorage.getItem("token");
   const location = useLocation();
   const expired = token ? isTokenExpired(token) : true;
+  const userRole = localStorage.getItem("role");
 
   console.log("PrivateRoute - Token:", token ? "Present" : "Missing", "Expired:", expired, "Path:", location.pathname); // Debug
 
@@ -35,6 +36,18 @@ const PrivateRoute = ({ children }) => {
     localStorage.removeItem("token");
     console.log("PrivateRoute: Redirecting to /login"); // Debug
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Role-based protection
+  if (role && userRole !== role) {
+    // Redirect to correct dashboard
+    if (userRole === "Admin") {
+      return <Navigate to="/admin/dashboard" replace />;
+    } else if (userRole === "Psychologist") {
+      return <Navigate to="/PsychologistDashboard" replace />;
+    } else {
+      return <Navigate to="/UserDashboard" replace />;
+    }
   }
 
   return children;

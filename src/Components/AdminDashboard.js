@@ -3,6 +3,12 @@ import axios from "../api/axios";
 import { motion } from "framer-motion";
 import Loader from "./Loader";
 import "./AdminDashboard.css";
+import { FaBan, FaUserShield, FaUserCheck, FaTrash, FaUserPlus } from "react-icons/fa";
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+const POLL_INTERVAL = 20000; // 20 seconds
 
 const AdminDashboard = () => {
   const [data, setData] = useState({
@@ -16,27 +22,120 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(Date.now());
+  const prevDataRef = React.useRef({ users: [], appointments: [], transactions: [] });
 
-  const handleLogin = async () => {
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchDashboardData();
+      const interval = setInterval(() => {
+        fetchDashboardData(true);
+      }, POLL_INTERVAL);
+      return () => clearInterval(interval);
+    }
+  }, [isLoggedIn]);
+
+  const fetchDashboardData = async (isPolling = false) => {
+    setLoading(!isPolling);
+    setError("");
     try {
-      const res = await axios.post("/api/admin/simple-dashboard", {
-        email: credentials.email,
-        password: credentials.password,
-      });
+      const res = await axios.post("/api/admin/simple-dashboard", credentials);
       setData(res.data);
-      setLoading(false);
+      setLastUpdated(Date.now());
+      if (isPolling) {
+        // Compare with previous data for alerts
+        const prev = prevDataRef.current;
+        // New user
+        if (res.data.users.length > prev.users.length) {
+          toast.info("New user signed up!");
+        }
+        // New appointment
+        if (res.data.appointments.length > prev.appointments.length) {
+          toast.info("New appointment booked!");
+        }
+        // New failed payment
+        const prevFailed = prev.transactions.filter(t => t.status === 'failed').length;
+        const currFailed = res.data.transactions.filter(t => t.status === 'failed').length;
+        if (currFailed > prevFailed) {
+          toast.error("A payment failed!");
+        }
+        prevDataRef.current = {
+          users: res.data.users,
+          appointments: res.data.appointments,
+          transactions: res.data.transactions,
+        };
+      } else {
+        prevDataRef.current = {
+          users: res.data.users,
+          appointments: res.data.appointments,
+          transactions: res.data.transactions,
+        };
+      }
     } catch (err) {
-      console.error("Failed to fetch dashboard data:", err);
       setError(err.response?.data?.message || "Failed to load dashboard data. Ensure correct admin credentials.");
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  const handleLogin = async () => {
+    setIsLoggedIn(true);
   };
 
-  if (loading) {
+  // User actions
+  const handleBanUser = async (userId) => {
+    try {
+      await axios.put(`/api/admin/users/${userId}/ban`);
+      setData((prev) => ({ ...prev, users: prev.users.map(u => u._id === userId ? { ...u, status: "Banned" } : u) }));
+    } catch (err) {
+      alert("Failed to ban user");
+    }
+  };
+  const handlePromoteUser = async (userId) => {
+    try {
+      await axios.put(`/api/admin/users/${userId}/promote`);
+      setData((prev) => ({ ...prev, users: prev.users.map(u => u._id === userId ? { ...u, role: "Admin" } : u) }));
+    } catch (err) {
+      alert("Failed to promote user");
+    }
+  };
+  // Psychologist actions
+  const handleApprovePsych = async (psychId) => {
+    try {
+      await axios.put(`/api/admin/psychologists/${psychId}/approve`);
+      setData((prev) => ({ ...prev, psychologists: prev.psychologists.map(p => p._id === psychId ? { ...p, status: "Approved" } : p) }));
+    } catch (err) {
+      alert("Failed to approve psychologist");
+    }
+  };
+  const handleRemovePsych = async (psychId) => {
+    try {
+      await axios.delete(`/api/admin/psychologists/${psychId}`);
+      setData((prev) => ({ ...prev, psychologists: prev.psychologists.filter(p => p._id !== psychId) }));
+    } catch (err) {
+      alert("Failed to remove psychologist");
+    }
+  };
+  const handlePromotePsych = async (psychId) => {
+    try {
+      await axios.put(`/api/admin/psychologists/${psychId}/promote`);
+      setData((prev) => ({ ...prev, psychologists: prev.psychologists.map(p => p._id === psychId ? { ...p, role: "Admin" } : p) }));
+    } catch (err) {
+      alert("Failed to promote psychologist");
+    }
+  };
+
+  // Analytics
+  const analytics = {
+    totalUsers: data.users.length,
+    totalPsychologists: data.psychologists.length,
+    activeSessions: data.appointments.filter(a => a.status === "Booked").length,
+    totalRevenue: data.transactions.reduce((sum, t) => sum + (t.amount || 0), 0),
+  };
+
+  if (loading) return <Loader />;
+  if (!isLoggedIn) {
     return (
       <div className="admin-login-container">
         <h2>Admin Login</h2>
@@ -45,7 +144,7 @@ const AdminDashboard = () => {
           name="email"
           placeholder="Email"
           value={credentials.email}
-          onChange={handleChange}
+          onChange={e => setCredentials({ ...credentials, email: e.target.value })}
           className="admin-login-input"
         />
         <input
@@ -53,7 +152,7 @@ const AdminDashboard = () => {
           name="password"
           placeholder="Password"
           value={credentials.password}
-          onChange={handleChange}
+          onChange={e => setCredentials({ ...credentials, password: e.target.value })}
           className="admin-login-input"
         />
         <button onClick={handleLogin} className="admin-login-button">
@@ -64,16 +163,140 @@ const AdminDashboard = () => {
     );
   }
 
+  const COLORS = ["#4F46E5", "#10B981", "#F59E42", "#EF4444", "#6366F1", "#FBBF24", "#3B82F6"];
+
   return (
-    <motion.div
-      className="admin-dashboard-container"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <motion.div className="admin-dashboard-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <motion.h1 initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
         Admin Dashboard
       </motion.h1>
+      <ToastContainer position="top-right" autoClose={4000} />
+      <div className="last-updated">Last updated: {new Date(lastUpdated).toLocaleTimeString()}</div>
+      <div className="admin-analytics-row">
+        <div className="analytics-card"><span>Total Users</span><strong>{analytics.totalUsers}</strong></div>
+        <div className="analytics-card"><span>Psychologists</span><strong>{analytics.totalPsychologists}</strong></div>
+        <div className="analytics-card"><span>Active Sessions</span><strong>{analytics.activeSessions}</strong></div>
+        <div className="analytics-card"><span>Total Revenue</span><strong>PKR {analytics.totalRevenue.toLocaleString()}</strong></div>
+      </div>
+      <div className="admin-charts-section">
+        <h2>Analytics</h2>
+        <div className="admin-charts-grid">
+          {/* User Growth Over Time */}
+          <div className="chart-card">
+            <h4>User Growth</h4>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={getUserGrowthData(data.users)}>
+                <XAxis dataKey="date" />
+                <YAxis allowDecimals={false} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="count" stroke="#4F46E5" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Revenue Over Time */}
+          <div className="chart-card">
+            <h4>Revenue</h4>
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={getRevenueData(data.transactions)}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="revenue" stroke="#10B981" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Appointments by Status */}
+          <div className="chart-card">
+            <h4>Appointments by Status</h4>
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie data={getAppointmentStatusData(data.appointments)} dataKey="value" nameKey="status" outerRadius={80}>
+                  {getAppointmentStatusData(data.appointments).map((entry, idx) => (
+                    <Cell key={`cell-${idx}`} fill={COLORS[idx % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Top Psychologists by Appointments */}
+          <div className="chart-card">
+            <h4>Top Psychologists</h4>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={getTopPsychologistsData(data.appointments)}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="count" fill="#6366F1" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+      {/* Export Buttons */}
+      <div className="export-row">
+        <button className="export-btn" onClick={() => exportCSV(data.users, 'users.csv')}>Export Users CSV</button>
+        <button className="export-btn" onClick={() => exportCSV(data.appointments, 'appointments.csv')}>Export Appointments CSV</button>
+      </div>
+      <section className="dashboard-section">
+        <h2>User Management</h2>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.users.map((user) => (
+              <tr key={user._id}>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.role}</td>
+                <td>{user.status || "Active"}</td>
+                <td>
+                  <button className="action-btn" title="Ban" onClick={() => handleBanUser(user._id)}><FaBan /></button>
+                  <button className="action-btn" title="Promote to Admin" onClick={() => handlePromoteUser(user._id)}><FaUserShield /></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      <section className="dashboard-section">
+        <h2>Psychologist Management</h2>
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.psychologists.map((p) => (
+              <tr key={p._id}>
+                <td>{p.name}</td>
+                <td>{p.email}</td>
+                <td>{p.status || "Pending"}</td>
+                <td>
+                  <button className="action-btn" title="Approve" onClick={() => handleApprovePsych(p._id)}><FaUserCheck /></button>
+                  <button className="action-btn" title="Remove" onClick={() => handleRemovePsych(p._id)}><FaTrash /></button>
+                  <button className="action-btn" title="Promote to Admin" onClick={() => handlePromotePsych(p._id)}><FaUserPlus /></button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
 
       <section className="dashboard-section">
         <h2>Users</h2>
@@ -267,3 +490,56 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
+function getUserGrowthData(users) {
+  // Aggregate users by registration date (YYYY-MM-DD)
+  const map = {};
+  users.forEach(u => {
+    const date = u.createdAt ? u.createdAt.slice(0, 10) : 'Unknown';
+    map[date] = (map[date] || 0) + 1;
+  });
+  // Cumulative sum
+  const dates = Object.keys(map).sort();
+  let total = 0;
+  return dates.map(date => ({ date, count: total += map[date] }));
+}
+function getRevenueData(transactions) {
+  // Aggregate revenue by date
+  const map = {};
+  transactions.forEach(t => {
+    const date = t.createdAt ? t.createdAt.slice(0, 10) : 'Unknown';
+    map[date] = (map[date] || 0) + (t.amount || 0) / 100;
+  });
+  return Object.keys(map).sort().map(date => ({ date, revenue: map[date] }));
+}
+function getAppointmentStatusData(appointments) {
+  const map = {};
+  appointments.forEach(a => {
+    map[a.status] = (map[a.status] || 0) + 1;
+  });
+  return Object.keys(map).map(status => ({ status, value: map[status] }));
+}
+function getTopPsychologistsData(appointments) {
+  const map = {};
+  appointments.forEach(a => {
+    const name = a.psychologistId?.name || 'Unknown';
+    map[name] = (map[name] || 0) + 1;
+  });
+  // Top 5
+  return Object.keys(map)
+    .map(name => ({ name, count: map[name] }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+}
+function exportCSV(data, filename) {
+  if (!data || !data.length) return;
+  const keys = Object.keys(data[0]);
+  const csv = [keys.join(",")].concat(data.map(row => keys.map(k => JSON.stringify(row[k] ?? "")).join(","))).join("\n");
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}

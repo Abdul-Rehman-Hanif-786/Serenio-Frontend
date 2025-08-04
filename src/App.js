@@ -58,14 +58,30 @@ const App = () => {
             }
           />
 
-          <Route path="/sentimentAnalysisDashboard/:sessionId" element={<SentimentAnalysisDashboard />} />
+          {/* Sentiment Analysis Routes */}
+          <Route 
+            path="/sentimentAnalysisDashboard/:sessionId" 
+            element={
+              <PrivateRoute>
+                <SentimentAnalysisDashboard />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/sentiment-analysis/:sessionId" 
+            element={
+              <PrivateRoute>
+                <SentimentAnalysisDashboard />
+              </PrivateRoute>
+            } 
+          />
 
           <Route path="/mood-tracker" element={<MoodTracker />} />
 
           <Route
             path="/AdminDashboard"
             element={
-              <PrivateRoute>
+              <PrivateRoute role="Admin">
                 <AdminDashboard />
               </PrivateRoute>
             }
@@ -73,13 +89,21 @@ const App = () => {
           <Route
             path="/UserDashboard"
             element={
-              <PrivateRoute>
+              <PrivateRoute role="User">
                 <UserDashboard />
               </PrivateRoute>
             }
           />
           <Route
             path="/Chatbot"
+            element={
+              <PrivateRoute>
+                <Chatbot />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chatbot"
             element={
               <PrivateRoute>
                 <Chatbot />
@@ -154,9 +178,23 @@ const App = () => {
               </PrivateRoute>
             }
           />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <PrivateRoute role="Admin">
+                <AdminDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/PsychologistDashboard"
+            element={
+              <PrivateRoute role="Psychologist">
+                <PsychologistDashboard />
+              </PrivateRoute>
+            }
+          />
           <Route path="/Loader" element={<Loader />} />
-          <Route path="/PsychologistDashboard" element={<PsychologistDashboard />} />
         </Routes>
 
         <ToastContainer

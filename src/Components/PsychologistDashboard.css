@@ -144,3 +144,107 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
+.psych-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 12px;
+  margin-bottom: 32px;
+  overflow: hidden;
+}
+.psych-table th, .psych-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+}
+.psych-table th {
+  background: #f4f4f4;
+  font-weight: 600;
+  color: #333;
+}
+.psych-table tr:last-child td {
+  border-bottom: none;
+}
+.psych-table tr:hover {
+  background: #f9fafb;
+}
+.action-btn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-right: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.action-btn:hover {
+  background: #4338ca;
+}
+.client-analytics-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.client-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 18px 22px;
+  min-width: 220px;
+  max-width: 260px;
+  flex: 1 1 220px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.client-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.client-name {
+  font-weight: 600;
+  color: #333;
+}
+.client-sentiment {
+  font-size: 0.95em;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: #e0e7ff;
+  color: #3730a3;
+}
+.client-sentiment.positive {
+  background: #d1fae5;
+  color: #065f46;
+}
+.client-sentiment.negative {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.client-sentiment.neutral {
+  background: #f3f4f6;
+  color: #374151;
+}
+.client-info {
+  font-size: 0.95em;
+  color: #666;
+  margin-bottom: 6px;
+}
+.client-mood-trend {
+  font-size: 0.95em;
+  color: #4f46e5;
+  font-weight: 500;
+}
+.last-updated {
+  font-size: 0.95em;
+  color: #6b7280;
+  margin-bottom: 12px;
+  text-align: right;
+}
+

@@ -4,8 +4,17 @@ import api from "../api/axios";
 import Loader from "./Loader"; // ✅ Spinner component
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import PaymentComponent from "./PaymentComponent";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe("pk_test_XXXXXXXXXXXXXXXXXXXXXXXX"); // TODO: Replace with your real Stripe publishable key from https://dashboard.stripe.com/apikeys
 
 const PaymentForm = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { psychologist, sessionPrice, appointment } = location.state || {};
   const [selectedMethod, setSelectedMethod] = useState("");
   const [transactionId, setTransactionId] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -70,7 +79,7 @@ const PaymentForm = () => {
     }
   };
 
-  // ✅ Show loader initially
+  // Show loader initially
   if (initialLoading) {
     return (
       <div className="payment-card initial-loader">
@@ -86,9 +95,44 @@ const PaymentForm = () => {
         <div className="payment-header">
           <div className="icon-circle">💳</div>
           <h2>Payment</h2>
-          <p>Choose your preferred payment method</p>
+          <p>Confirm your session booking and pay securely</p>
         </div>
 
+        {/* Show psychologist and session info */}
+        {psychologist && (
+          <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '5px', border: '1px solid #b3d9ff' }}>
+            <h4>Psychologist:</h4>
+            <p><strong>Name:</strong> {psychologist.name}</p>
+            <p><strong>Specialization:</strong> {psychologist.specialization}</p>
+            <p><strong>Session Price:</strong> PKR {sessionPrice}</p>
+          </div>
+        )}
+        {appointment && (
+          <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#f7f7f7', borderRadius: '5px', border: '1px solid #eee' }}>
+            <h4>Appointment Details:</h4>
+            <p><strong>Date:</strong> {appointment.date}</p>
+            <p><strong>Time:</strong> {appointment.timeSlot}</p>
+            <p><strong>Reason:</strong> {appointment.reason}</p>
+          </div>
+        )}
+
+        {/* Stripe Payment */}
+        <div style={{ marginBottom: '30px' }}>
+          <Elements stripe={stripePromise}>
+            <PaymentComponent
+              amount={sessionPrice}
+              currency="pkr"
+              onSuccess={() => {
+                toast.success("Payment successful! Redirecting to your appointments...");
+                setTimeout(() => navigate("/my-appointments"), 2000);
+              }}
+            />
+          </Elements>
+        </div>
+
+        {/* Optionally, keep manual payment methods below Stripe */}
+        <hr style={{ margin: '30px 0' }} />
+        <h4>Or pay manually:</h4>
         <form onSubmit={handleSubmit}>
           <div className="payment-methods">
             <label className={`method ${selectedMethod === "JazzCash" ? "selected" : ""}`}>
@@ -104,7 +148,6 @@ const PaymentForm = () => {
                 <p>Mobile wallet payment</p>
               </div>
             </label>
-
             <label className={`method ${selectedMethod === "Easypaisa" ? "selected" : ""}`}>
               <input
                 type="radio"
@@ -118,7 +161,6 @@ const PaymentForm = () => {
                 <p>Digital wallet payment</p>
               </div>
             </label>
-
             <label className={`method ${selectedMethod === "Bank" ? "selected" : ""}`}>
               <input
                 type="radio"
@@ -133,7 +175,6 @@ const PaymentForm = () => {
               </div>
             </label>
           </div>
-
           <div className="form-group">
             <label>Transaction ID</label>
             <input
@@ -144,7 +185,6 @@ const PaymentForm = () => {
               required
             />
           </div>
-
           <div className="form-group">
             <label>Phone Number</label>
             <input
@@ -155,18 +195,16 @@ const PaymentForm = () => {
               required
             />
           </div>
-
           <button type="submit" className="submit-btn" disabled={loading}>
             {loading ? (
               <>
                 <Loader /> Processing...
               </>
             ) : (
-              "✅ Confirm Payment"
+              "✅ Confirm Manual Payment"
             )}
           </button>
         </form>
-
         <p className="secured-text">🔒 Secured by Serenio</p>
       </div>
       <ToastContainer />

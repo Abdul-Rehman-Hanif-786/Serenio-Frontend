@@ -14,6 +14,8 @@ const AppointmentForm = () => {
   const [psychologist, setPsychologist] = useState(null);
   const [error, setError] = useState("");
   const [loadingPsychologists, setLoadingPsychologists] = useState(true);
+  // Remove psychologists array and dropdown
+  // const [psychologists, setPsychologists] = useState([]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -30,66 +32,28 @@ const AppointmentForm = () => {
   }, [navigate]);
 
   // Hardcoded sample psychologist for demonstration
-  const samplePsychologist = {
-    _id: "66885b1e32e09e974e09faf32",
-    name: "Dr. Alice Smith",
-    specialization: "Therapist",
-    hourlyRate: 5000,
-  };
+  // const samplePsychologist = {
+  //   _id: "66885b1e32e09e974e09faf32",
+  //   name: "Dr. Alice Smith",
+  //   specialization: "Therapist",
+  //   hourlyRate: 5000,
+  // };
 
   useEffect(() => {
     // If psychologist data is passed from professionals tab, use it
-    if (passedPsychologistId) {
+    if (location.state?.psychologist) {
+      setPsychologist(location.state.psychologist);
       setForm((prev) => ({
         ...prev,
-        psychologistId: passedPsychologistId,
-        date: date || prev.date,
-        time: timeSlot || prev.time,
+        psychologistId: location.state.psychologist._id,
       }));
-      
-      // Set psychologist info if available in location state
-      if (location.state?.psychologist) {
-        setPsychologist(location.state.psychologist);
-      }
     } else {
-      // Fallback to fetching psychologists if no data passed
-      fetchPsychologists();
+      setError("No psychologist selected. Please choose a psychologist first.");
+      setTimeout(() => navigate("/Professionals"), 2000);
     }
-  }, [passedPsychologistId, date, timeSlot, location.state]);
+  }, [location.state, navigate]);
 
-  const fetchPsychologists = async () => {
-    try {
-      setLoadingPsychologists(true);
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Please log in to fetch psychologists.");
-        return;
-      }
-      
-      const res = await axios.get("/api/psychologists", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("Fetched psychologists:", res.data);
-      
-      // Use the first available psychologist or the passed one
-      const selectedPsych = res.data?.[0] || samplePsychologist;
-      setPsychologist(selectedPsych);
-      setForm((prev) => ({
-        ...prev,
-        psychologistId: selectedPsych._id,
-      }));
-    } catch (err) {
-      console.error("Failed to fetch psychologists:", err);
-      // Fallback to hardcoded psychologist
-      setPsychologist(samplePsychologist);
-      setForm((prev) => ({
-        ...prev,
-        psychologistId: samplePsychologist._id,
-      }));
-    } finally {
-      setLoadingPsychologists(false);
-    }
-  };
+  // Remove fetchPsychologists function entirely
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -203,7 +167,18 @@ const AppointmentForm = () => {
       
       // Navigate after a short delay to show success message
       setTimeout(() => {
-        navigate("/my-appointments");
+        navigate("/PaymentForm", {
+          state: {
+            psychologist,
+            sessionPrice: psychologist?.sessionPrice || psychologist?.hourlyRate || 0,
+            appointment: {
+              psychologistId: form.psychologistId,
+              date: formattedDate,
+              timeSlot: form.time,
+              reason: form.reason,
+            },
+          },
+        });
       }, 3000);
     } catch (err) {
       console.error("Booking error details:", {
@@ -283,13 +258,14 @@ const AppointmentForm = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {/* Psychologist Info Display */}
+        {/* Remove Psychologist Selection Dropdown */}
+        {/* Only show Psychologist Info Display */}
         {psychologist && (
           <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#e8f4fd', borderRadius: '5px', border: '1px solid #b3d9ff' }}>
             <h4>Selected Psychologist:</h4>
             <p><strong>Name:</strong> {psychologist.name}</p>
             <p><strong>Specialization:</strong> {psychologist.specialization}</p>
-            <p><strong>Hourly Rate:</strong> ${psychologist.hourlyRate}</p>
+            <p><strong>Session Price:</strong> {psychologist.sessionPrice ? `PKR ${psychologist.sessionPrice}` : psychologist.hourlyRate ? `PKR ${psychologist.hourlyRate}` : 'N/A'}</p>
           </div>
         )}
 

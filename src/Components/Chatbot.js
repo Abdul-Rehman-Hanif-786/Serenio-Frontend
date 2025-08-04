@@ -5,6 +5,7 @@ import api from "../api/axios";
 import Loader from "./Loader";
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
+import RealTimeSentiment from "./RealTimeSentiment";
 
 const analyzeSentiment = (text) => {
   const lowerText = text.toLowerCase();
@@ -34,6 +35,7 @@ const Chatbot = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [showSentiment, setShowSentiment] = useState(false);
   const chatMessagesRef = useRef(null);
 
   useEffect(() => {
@@ -85,7 +87,7 @@ const Chatbot = () => {
       const botReply = {
         sender: "bot",
         name: "Serenio AI",
-        text: res.data.botReply || "Sorry, I didn’t understand that.",
+        text: res.data.botReply || "Sorry, I didn't understand that.",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         sentiment: null,
       };
@@ -100,121 +102,169 @@ const Chatbot = () => {
       const errorReply = {
         sender: "bot",
         name: "Serenio AI",
-        text: "Oops! Something went wrong while processing your message.",
+        text: "I'm having trouble connecting right now. Please try again.",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         sentiment: null,
       };
       setMessages((prev) => [...prev, errorReply]);
+    } finally {
+      setLoading(false);
+      setInput("");
     }
-
-    setInput("");
-    setLoading(false);
   };
 
   const handleEndChat = () => {
+    navigate(`/sentimentAnalysisDashboard/${sessionId}`);
+  };
+
+  const handleClearChat = () => {
+    // Generate new session ID
+    const newSessionId = uuidv4();
+    setSessionId(newSessionId);
+    localStorage.setItem("serenioSessionId", newSessionId);
+    
+    // Clear messages and reset to initial state
     setMessages([
       {
         sender: "bot",
         name: "Serenio AI",
-        text: "Thank you for chatting. Take care! 😊",
+        text: "Hello! I'm Serenio AI, your personal assistant. How can I help you today?",
         time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         sentiment: null,
       },
     ]);
+    
+    // Hide sentiment analysis
+    setShowSentiment(false);
+  };
 
-    const sid = localStorage.getItem("serenioSessionId");
-    if (sid) {
-      navigate(`/SentimentAnalysisDashboard/${sid}`); // Redirect with sessionId
-      // Optionally clear sessionId after navigation if you want a new session next time
-      // localStorage.removeItem("serenioSessionId");
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
   if (pageLoading) {
     return (
-      <div className="chatbot-loader-screen">
-        <Loader size={32} color="#333" />
-        <p>Loading Serenio AI...</p>
+      <div className="chatbot-container">
+        <div className="loading-screen">
+          <Loader size={60} />
+          <p>Initializing Serenio AI...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <motion.div
-      className="chatbot-container"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
-      <motion.div className="chatbot-header" initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
-        💬 Serenio AI
-      </motion.div>
+    <div className="chatbot-container">
+      {/* Real-time Sentiment Analysis */}
+      <RealTimeSentiment 
+        messages={messages} 
+        isVisible={showSentiment && messages.length > 1}
+      />
+      
+      <div className="chatbot-header">
+        <div className="chatbot-title">
+          <h2>Serenio AI</h2>
+          <p>Your Personal Mental Health Assistant</p>
+        </div>
+        <div className="chatbot-actions">
+          <motion.button
+            onClick={() => setShowSentiment(!showSentiment)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`sentiment-toggle-btn ${showSentiment ? 'active' : ''}`}
+            title="Toggle Sentiment Analysis"
+          >
+            📊
+          </motion.button>
+          <motion.button
+            onClick={handleClearChat}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="clear-chat-btn"
+            title="Clear Chat & Start New Session"
+          >
+            Clear Chat
+          </motion.button>
+          <motion.button
+            onClick={handleEndChat}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="end-chat-btn"
+            title="End Chat & View Analysis"
+          >
+            End Chat
+          </motion.button>
+        </div>
+      </div>
 
-      <div className="chat-window" ref={chatMessagesRef}>
-        {messages.map((msg, idx) => (
+      <div className="chatbot-messages" ref={chatMessagesRef}>
+        {messages.map((message, index) => (
           <motion.div
-            key={idx}
-            className={`message-block ${msg.sender === "user" ? "user-msg" : "bot-msg"}`}
+            key={index}
+            className={`message ${message.sender}`}
             variants={messageVariants}
             initial="hidden"
             animate="visible"
-            transition={{ duration: 0.4, delay: idx * 0.1 }}
+            transition={{ duration: 0.3 }}
           >
-            <div className="sender-name">{msg.name}</div>
-            <motion.div
-              className="message-bubble"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              {msg.text}
-            </motion.div>
-            <div className="meta">
-              <span className="time">{msg.time}</span>
-              {msg.sender === "user" && msg.sentiment && (
-                <span className={`sentiment ${msg.sentiment.toLowerCase()}`}>{msg.sentiment}</span>
+            <div className="message-content">
+              <div className="message-header">
+                <span className="message-name">{message.name}</span>
+                <span className="message-time">{message.time}</span>
+              </div>
+              <div className="message-text">{message.text}</div>
+              {message.sentiment && (
+                <div className="message-sentiment">
+                  <span className={`sentiment-badge ${message.sentiment.toLowerCase()}`}>
+                    {message.sentiment}
+                  </span>
+                </div>
               )}
             </div>
           </motion.div>
         ))}
-
-        {loading && <Loader />}
+        {loading && (
+          <motion.div
+            className="message bot"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="message-content">
+              <div className="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
 
-      <div className="chat-input-area">
-        <input
-          type="text"
-          className="chat-input"
-          placeholder="Type your message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        />
-        <motion.button
-          className="send-button"
-          onClick={handleSend}
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.05 }}
-        >
-          Send
-        </motion.button>
+      <div className="chatbot-input">
+        <div className="input-container">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type your message here..."
+            rows="1"
+            className="message-input"
+          />
+          <motion.button
+            onClick={handleSend}
+            disabled={loading || !input.trim()}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="send-button"
+          >
+            ➤
+          </motion.button>
+        </div>
       </div>
-
-      <motion.div
-        className="end-chat-wrapper"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        <motion.button
-          className="end-chat-button"
-          onClick={handleEndChat}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          End Chat
-        </motion.button>
-      </motion.div>
-    </motion.div>
+    </div>
   );
 };
 
